@@ -14,10 +14,14 @@ This repo contains all the required manifests and documentation to build a moder
   1. Clone the repo to your local environment.
   2. Create an aks/eks/gke/roll-you-own k8s cluster with dynamic storage provisioning support configured and enabled.
   3. Configure kubectl to remotely configure the k8s cluster.
-  4. Using your CLI of choice, in the manifests/setup folder, run: kubectl apply -f ./*.yaml --server-side
-  5. Using your CLI of choice, in the manifests/elk folder, run: kubectl apply -f ./*.yaml
-  6. Using your CLI of choice, in the manifests folder, run: kubectl apply -f ./*.yaml
-  7. Extract the ElasticSearch admin password using the following command: PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
+  4. Using your CLI of choice, in the manifests/setup folder, run: 
+                            kubectl apply -f ./*.yaml --server-side
+  5. Using your CLI of choice, in the manifests/elk folder, run: 
+                            kubectl apply -f ./*.yaml
+  6. Using your CLI of choice, in the manifests folder, run: 
+                            kubectl apply -f ./*.yaml
+  7. Extract the ElasticSearch admin password using the following command:
+                            PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')  
   8. Extract the Kibana Login URL: kibanaUrl=$(kubectl get service elastic-es-http)
 
   ![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
