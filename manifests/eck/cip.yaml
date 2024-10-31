@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: elastic-es-http
+spec:
+  selector:
+    common.k8s.elastic.co/type: elasticsearch
+    elasticsearch.k8s.elastic.co/cluster-name: elastic
+  ports: 9200
+  type: ClusterIP

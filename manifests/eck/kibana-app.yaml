@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kibana:4.6.4  
+spec:
+  elasticsearchRef:
+    name: elastic
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: kibana:4.6.4
+        ports:
+        - containerPort: 5601
+        env:
+        - name: ELASTICSEARCH_URL
+          value: "http://10.0.148.179:9200/"
+      imagePullSecrets:
+      - name: dockerreg-secret
