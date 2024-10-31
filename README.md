@@ -20,7 +20,7 @@ This repo contains all the required manifests and documentation to build a moder
   7. Extract the ElasticSearch admin password using the following command: PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
   8. Extract the Kibana Login URL: kibanaUrl=$(kubectl get service elastic-es-http)
 
-    ![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
+  ![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
 
     https://<LoadBalancerIp>:<Port>/
   
