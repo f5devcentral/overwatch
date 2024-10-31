@@ -22,11 +22,15 @@ spec:
           image: docker.elastic.co/logstash/logstash:8.13.4
           ports:
             - name: "tcp-syslog"
-              containerPort: 514
+              containerPort: 8514
+            - name: "udp-syslog"
+              containerPort: 7514
             - name: "tcp-beats"
               containerPort: 5044
             - name: "http-ec"
               containerPort: 8080
+            - name: "https-ec"
+              containerPort: 8443
           env:
             - name: ES_HOSTS
               value: "https://elastic-es-http.elk-test.svc:9200"
@@ -55,43 +59,3 @@ spec:
         # - name: ca-certs
         #   secret:
         #     secretName: elasticsearch-es-http-certs-public
-      pipelines:
-        - pipeline.id: main
-          config.string: |
-            input {
-              beats {
-                port => 5044
-              }
-              http {
-                port => 8080
-              }
-              syslog {
-                port => 8514
-                codec => cef
-                syslog_field => "syslog"
-                grok_pattern => "<%{POSINT:priority}>%{SYSLOGTIMESTAMP:timestamp}%{SYSLOGLINE}"
-              }
-            }
----
- 
-apiVersion: v1
-kind: Service
-metadata:
-  name: logstash
-  labels:
-    app.kubernetes.io/name: elasticsearch-logstash
-    app.kubernetes.io/component: logstash
-spec:
-  ports:
-    - name: "tcp-syslog"
-      port: 8514
-      targetPort: 8514
-    - name: "tcp-beats"
-      port: 5044
-      targetPort: 5044
-    - name: "http"
-      port: 8080
-      targetPort: 8080
-  selector:
-    app.kubernetes.io/name: elasticsearch-logstash
-    app.kubernetes.io/component: logstash

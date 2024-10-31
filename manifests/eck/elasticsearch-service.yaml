@@ -3,6 +3,8 @@ apiVersion: v1
 metadata:
   name: elastic-es-http
 spec:
+  elasticsearchRef:
+    name: elastic
   selector:
     common.k8s.elastic.co/type: elasticsearch
     elasticsearch.k8s.elastic.co/cluster-name: elastic
