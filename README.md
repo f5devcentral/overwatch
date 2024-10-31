@@ -2,31 +2,31 @@
 
 This repo contains all the required manifests and documentation to build a modern observability stack built on opensource software components. The manifests folder contains everything required to deploy a pre-configured pre-plumbed observability stack comprised of:
 
-  i.   Logstash
-  ii.  ElasticSearch
-  iii  Kibana
-  iv.  InfluxDB
-  v.   Prometheus
-  vi.  Grafana
+  1. Logstash
+  2. ElasticSearch
+  3. Kibana
+  4. InfluxDB
+  5. Prometheus
+  6. Grafana
 
 ## Getting Started
 
-1. Clone the repo to your local environment.
-2. Create an aks/eks/gke/roll-you-own k8s cluster with dynamic storage provisioning support configured and enabled.
-3. Configure kubectl to remotely configure the k8s cluster.
-4. Using your CLI of choice, in the manifests/setup folder, run: kubectl apply -f ./*.yaml --server-side
-5. Using your CLI of choice, in the manifests/elk folder, run: kubectl apply -f ./*.yaml
-6. Using your CLI of choice, in the manifests folder, run: kubectl apply -f ./*.yaml
-7. Extract the ElasticSearch admin password using the following command: PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
-8. Extract the Kibana Login URL: kibanaUrl=$(kubectl get service elastic-es-http)
+  1. Clone the repo to your local environment.
+  2. Create an aks/eks/gke/roll-you-own k8s cluster with dynamic storage provisioning support configured and enabled.
+  3. Configure kubectl to remotely configure the k8s cluster.
+  4. Using your CLI of choice, in the manifests/setup folder, run: kubectl apply -f ./*.yaml --server-side
+  5. Using your CLI of choice, in the manifests/elk folder, run: kubectl apply -f ./*.yaml
+  6. Using your CLI of choice, in the manifests folder, run: kubectl apply -f ./*.yaml
+  7. Extract the ElasticSearch admin password using the following command: PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
+  8. Extract the Kibana Login URL: kibanaUrl=$(kubectl get service elastic-es-http)
 
-![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
+    ![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
 
-  https://<LoadBalancerIp>:<Port>/
+    https://<LoadBalancerIp>:<Port>/
   
     Login with username 'elastic' and password retrieved in step 7. 
     
-    Happy ELK'ing!
+  Happy ELK'ing!
 
 ## Installation
 
