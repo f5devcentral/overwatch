@@ -1,16 +1,28 @@
-# Solutions Engineering Template Repository
-
-A template repository that contains all required files (LICENSE, SUPPORT, CONTRIBUTING, etc) as outlined in the org standards.  
-
-The sections below are recommended in your project's README.md file.
-
 ## Overview
 
-Provide a short overview of the project.
+This repo contains all the required manifests and documentation to build a modern observability stack built on opensource software components. The manifests folder contains everything required to deploy a pre-configured pre-plumbed observability stack comprised of:
+
+  i.   Logstash
+  ii.  ElasticSearch
+  iii  Kibana
+  iv.  InfluxDB
+  v.   Prometheus
+  vi.  Grafana
 
 ## Getting Started
 
-Provide a quick example of how to use your code.  This should provide the user with a launch point to quickly see what the project can offer them.
+1. Clone the repo to your local environment.
+2. Create an aks/eks/gke/roll-you-own k8s cluster with dynamic storage provisioning support configured and enabled.
+3. Configure kubectl to remotely configure the k8s cluster.
+4. Using your CLI of choice, in the manifests/setup folder, run: kubectl apply -f ./*.yaml --server-side
+5. Using your CLI of choice, in the manifests/elk folder, run: kubectl apply -f ./*.yaml
+6. Using your CLI of choice, in the manifests folder, run: kubectl apply -f ./*.yaml
+7. Extract the ElasticSearch admin password using the following command: PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
+8. Extract the Kibana Login URL: kibanaUrl=$(kubectl get service elastic-es-http)
+
+![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
+
+    Login and happy ELK'ing. 
 
 ## Installation
 
