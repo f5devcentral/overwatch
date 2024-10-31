@@ -22,7 +22,11 @@ This repo contains all the required manifests and documentation to build a moder
 
 ![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
 
-    Login and happy ELK'ing. 
+  https://<LoadBalancerIp>:<Port>/
+  
+    Login with username 'elastic' and password retrieved in step 7. 
+    
+    Happy ELK'ing!
 
 ## Installation
 
