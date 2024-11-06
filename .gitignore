@@ -1,3 +1,4 @@
-elk/creds.txt
+manifests/ECK/creds.txt
 overwatch.code-workspace
 .gitconfig
+aks-kubeconfig.py
