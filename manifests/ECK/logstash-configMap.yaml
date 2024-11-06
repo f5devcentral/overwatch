@@ -6,15 +6,28 @@ metadata:
     application: elk
     component: logstash
 data:
+  pipelines.yml: |
+    # Each input type is a seperate pipeline
+    - pipeline.id: syslog-pipeline
+      path.config: "/usr/share/logstash/config/input-syslog.yml"
+      pipeline.workers: 3
+      queue.type: persisted
+    - pipeline.id: filebeat-pipeline
+      path.config: "/usr/share/logstash/config/input-filebeat.yml"
+      queue.type: persisted
+    - pipeline.id: hec-pipeline
+      path.config: "/usr/share/logstash/config/input-http.yml"
+      pipeline.workers: 3
+      queue.type: persisted
   input-syslog.yml: |
-    # all input will come from filebeat, no local logs
+    # TCP and UDP Syslog inputs
     input {
       tcp {
         port => 8514
         type => syslog
       }
       udp {
-        port => 8514
+        port => 7514
         type => syslog
       }
     }
@@ -32,28 +45,107 @@ data:
     }
     output {
       elasticsearch {
-        index => "logstash-%{[@metadata][beat]}"
+        index => "logstash-%{[@metadata][syslog]-%{+YYYY.MM.dd}}"
         hosts => [ "${ES_HOSTS}" ]
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
-        cacert => '/etc/logstash/certificates/ca.crt'
+        document_type => "%{[@metadata][type]}"
+        ssl_verification_mode => none
       }
     }
   input-filebeat.yml: |
+    #filebeat input
     input {
       beats {
         port => 5044
       }
     }
-
     output {
       elasticsearch {
-        hosts => "es-ingest:9200"
-        manage_template => false
-        index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+        index => "logstash-%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+        hosts => [ "${ES_HOSTS}" ]
+        user => "${ES_USER}"
+        password => "${ES_PASSWORD}"
         document_type => "%{[@metadata][type]}"
+        ssl_verification_mode => none
       }
     }
+  input-http.yml: |
+    # HTTP/S event collector
+    input {
+      http {
+        port => 7080
+        ssl_enabled => false
+      }
+      https {
+        port => 7443
+        ssl_enabled => true
+        ssl_key => default.key
+        ssl_certificate => default.crt
+      }
+    }
+    output {
+      elasticsearch {
+        index => "logstash-%{[@metadata][hec]-%{+YYYY.MM.dd}}"
+        hosts => [ "${ES_HOSTS}" ]
+        user => "${ES_USER}"
+        password => "${ES_PASSWORD}"
+        document_type => "%{[@metadata][type]}"
+        ssl_verification_mode => none
+      }
+    }
+  default.key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDsdcq5mZ/JzIwJ
+    POVC6ooiI1mJwNGSsa7eTImBcg7J+1+QmkCyyGRG/hJTjYwjgL0swVYNSSTBi95v
+    h+6rdSpJXfFUtzIm9/QfLQnbTn6zQaEtHNUMruzH2QLkn+OL0x5N/KAWr7tNnhPU
+    YGRrURWvy6aKlz/mVOH8bxJRjQU3YARWXb/Aqvo01WL4D/XM34NfEVxogzqZrFa+
+    sUWTncnFT6Z6Y88GEeg9Mxa/ABg+f0SFjXIcsH/sKC2bXTXqlj7p8XslfHU3MgNY
+    rXdpGR4UFv3P8BDaEf8hfM0NXDhIDC2d31Txjk35HNRBKdn1WodOf9pgP7DExO2U
+    jjiezvzxAgMBAAECggEAOyHV2YYubGOnnWPKHWrTsmfOq2E5x4qBpXvUYzentSEU
+    q++3QD5WvV4qLRTXt8UpCbkrkNT6yR/2N0PyDpSVR5WjlUDe3NnjBazYqyw9CQzf
+    ho2QRcS01+FQFOZbHAtmp7AGRMYbe/SNFu4oDqJPXw/5jOz4ANy3Ss5n8VbnuAni
+    3Tn8cVp8DOzlhlP0D+ZSBJOWDxsaVrBNYC1rvikN7bFh3QnRKErnGmPZN4TIPyCl
+    tlgDF+bCOl7/fSBAIoXAyzdnHxclyTZjhpTLxLZ2Mc2XNvXngN5Idg5l/R5JsEti
+    TLbKexHeGgnDojJjXR26IflbzkBq0pfAu8DF2XDqxQKBgQD3J7f4iPAeq1myxs02
+    eLH9zoseGJnSKLcgFND/Op8D8iRcCgfkIDcTem7P7MqpH6x/8tp0yfnSSwftZBe7
+    VW10HYg9M2vfACf0O3VNvsLalWStFPmZy7yAcq7p5U746MPkRmGCrhTNH0QEGcoE
+    kYTGtdmioada3mXTYtowpEQw2wKBgQD07BeTpmaAgvRo9e14bk3zXFvnE/VxuREE
+    O+WuPo2mTqRmwHbwAQR37Nkuwp6n1sDSnaM8zhmhYZBQBYpoJ4HOlDzYEA0q+foh
+    Z+kKcr2vyS1bC/Opa08V3aLKV+xmteE7BDf28SqKVXuwvfv68uI2oJ+hI+uHGny6
+    kyZkonKdIwKBgQC8LFBkeJYhM6K6e6P4ahJSRDQlOOO8X2V1loO9Hvu8vFo0fSqe
+    5Gwqd1fxFL8D3uquC8+JhdGf66JgeombBqKr+mQk/IaPpYXF7JMWGzwtwfqB0Ots
+    zfJ59Vb5G65x0n56yZ8qKLILrldRq/TkX4qw4/mMWfmaNKNgOu4WhKqqawKBgD6w
+    28wQULZeTr87C8DCwzMileeNBUtJqqBh0IWMP2etQ4mFhCwkpocn2eONL10YrBx8
+    +xaKTqcvOOgyst28Fw7QhM5tNWGlwK+iUFU7T3BaV0Cxy3m3HPQk2hFe9gTIU1Fu
+    4ABWdKQaA2IXDxOJ7fs7nAB8GEJptjlvhulFZ37vAoGAR1K2JtGUYLRiwMt1xNEP
+    fgjBkTwZnCX1QY5nKpvJ6NpwJk5uOgybk7sT9eGv4TzNjsACxmH+Fn/AYGJ23sEc
+    Twb8KvV6ohT9S/35Euv7gGt+bWnQCzvccIT53jbMUidhfgdVfLXANZS+OHS+yehd
+    x31uf6fUJqFiLcWI5E4QaWA=
+    -----END PRIVATE KEY-----
+  default.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDrjCCApagAwIBAgIEFdZqmjANBgkqhkiG9w0BAQsFADCBmDELMAkGA1UEBhMC
+    VVMxCzAJBgNVBAgTAldBMRAwDgYDVQQHEwdTZWF0dGxlMRIwEAYDVQQKEwlNeUNv
+    bXBhbnkxCzAJBgNVBAsTAklUMR4wHAYDVQQDExVsb2NhbGhvc3QubG9jYWxkb21h
+    aW4xKTAnBgkqhkiG9w0BCQEWGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWluMB4X
+    DTIxMDgxMTE4MjUzMFoXDTMxMDgwOTE4MjUzMFowgZgxCzAJBgNVBAYTAlVTMQsw
+    CQYDVQQIEwJXQTEQMA4GA1UEBxMHU2VhdHRsZTESMBAGA1UEChMJTXlDb21wYW55
+    MQswCQYDVQQLEwJJVDEeMBwGA1UEAxMVbG9jYWxob3N0LmxvY2FsZG9tYWluMSkw
+    JwYJKoZIhvcNAQkBFhpyb290QGxvY2FsaG9zdC5sb2NhbGRvbWFpbjCCASIwDQYJ
+    KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOx1yrmZn8nMjAk85ULqiiIjWYnA0ZKx
+    rt5MiYFyDsn7X5CaQLLIZEb+ElONjCOAvSzBVg1JJMGL3m+H7qt1Kkld8VS3Mib3
+    9B8tCdtOfrNBoS0c1Qyu7MfZAuSf44vTHk38oBavu02eE9RgZGtRFa/LpoqXP+ZU
+    4fxvElGNBTdgBFZdv8Cq+jTVYvgP9czfg18RXGiDOpmsVr6xRZOdycVPpnpjzwYR
+    6D0zFr8AGD5/RIWNchywf+woLZtdNeqWPunxeyV8dTcyA1itd2kZHhQW/c/wENoR
+    /yF8zQ1cOEgMLZ3fVPGOTfkc1EEp2fVah05/2mA/sMTE7ZSOOJ7O/PECAwEAATAN
+    BgkqhkiG9w0BAQsFAAOCAQEAwgfjmNaZycH0uyuPVqUYjvHMULn4rSt9wh0kUGTb
+    Wp4yIfNm4azg/hkHhhLd9qcOJECHPOyQ8GXbucQFjx1U1Zlw8npc5hEnq5rztg3K
+    XS8pZiGRXenvnNK2YlH20aEsYda5QRRMcmSvmgDRh4RpugWATqIwObQP5qDIT+bc
+    5NJDC1KybUX172H1q8Va/8cJnaDDn6NwR0eNXSTJ6VPLqrGy7bi7ByExCnbRaEkX
+    e2+lv1i6xANtTylVMKaqHrFGEndysTWuSUb3Kun/QIpAmyQA0yBfJNgaE50roXmP
+    tLG27U8hfviCUPaBOdELDUJ7R4NVWvF6PTY/03xYsO0vdQ==
+    -----END CERTIFICATE-----
   logstash.yml: |
     # Settings file in YAML
     #

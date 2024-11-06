@@ -28,12 +28,12 @@ spec:
             - name: "tcp-beats"
               containerPort: 5044
             - name: "http-ec"
-              containerPort: 8080
+              containerPort: 7080
             - name: "https-ec"
-              containerPort: 8443
+              containerPort: 7443
           env:
             - name: ES_HOSTS
-              value: "https://elastic-es-http.elk-test.svc:9200"
+              value: "https://elastic-es-http:9200"
             - name: ES_USER
               value: "elastic"
             - name: ES_PASSWORD

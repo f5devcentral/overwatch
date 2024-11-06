@@ -38,7 +38,8 @@ metadata:
 data:
   eck.yaml: |-
     log-verbosity: 0
-    metrics-port: 0
+    metrics-port: 8080
+    metrics-host: 0.0.0.0
     container-registry: docker.elastic.co
     max-concurrent-reconciles: 3
     ca-cert-validity: 8760h
@@ -54,6 +55,8 @@ data:
     validate-storage-class: true
     enable-webhook: true
     webhook-name: elastic-webhook.k8s.elastic.co
+    webook-port: 9443
+    action.auto_create_index: +logstash-*,+f5.*,+.monitoring-*,+.kibana-*
 ---
 # Source: eck-operator/templates/cluster-roles.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -399,6 +402,9 @@ spec:
         ports:
         - containerPort: 9443
           name: https-webhook
+          protocol: TCP
+        - containerPort: 8080
+          name: metrics
           protocol: TCP
         volumeMounts:
         - mountPath: "/conf"

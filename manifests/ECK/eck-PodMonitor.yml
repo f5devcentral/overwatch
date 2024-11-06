@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: elastic-operator
+  namespace: elastic-system
+  labels:
+    control-plane: elastic-operator
+    app.kubernetes.io/component: metrics
+spec:
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 1m
+      scrapeTimeout: 30s
+  namespaceSelector:
+    matchNames:
+      - elastic-system
+  selector:
+    matchLabels:
+      control-plane: elastic-operator

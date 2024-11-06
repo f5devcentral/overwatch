@@ -54,15 +54,4 @@ spec:
           requests:
             storage: 1Gi
         volumeMode: Filesystem
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: influxdbdata
-  labels:
-    type: local
-spec:
-  capacity:
-    storage: 1Gi
-  hostPath:
-    path: "/mnt/data/ckan"
+

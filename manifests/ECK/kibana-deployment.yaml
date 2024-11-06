@@ -18,6 +18,6 @@ spec:
         - containerPort: 5601
         env:
         - name: ELASTICSEARCH_URL
-          value: "http://10.0.148.179:9200/"
+          value: "https://elastic-es-http:9200/"
       imagePullSecrets:
       - name: dockerreg-secret
