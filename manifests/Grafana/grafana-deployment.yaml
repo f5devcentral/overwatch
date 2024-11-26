@@ -160,15 +160,12 @@ spec:
         runAsUser: 65534
       serviceAccountName: grafana
       volumes:
-      - emptyDir: {}
-        name: grafana-storage
+      - name: grafana-storage
         persistentVolumeClaim:  
           claimName: grafanadata
       - name: grafana-datasources
         persistentVolumeClaim:  
           claimName: grafanadata
-        secret:
-          secretName: grafana-datasources
       - configMap:
           name: grafana-dashboards
         name: grafana-dashboards

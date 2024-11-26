@@ -14,21 +14,21 @@ data:
       queue.type: persisted
     - pipeline.id: filebeat-pipeline
       path.config: "/usr/share/logstash/config/input-filebeat.yml"
-      queue.type: persisted
     - pipeline.id: hec-pipeline
       path.config: "/usr/share/logstash/config/input-http.yml"
       pipeline.workers: 3
-      queue.type: persisted
   input-syslog.yml: |
     # TCP and UDP Syslog inputs
     input {
       tcp {
         port => 8514
         type => syslog
+        codec => plain { charset=>"ASCII" }
       }
       udp {
         port => 7514
         type => syslog
+        codec => plain { charset=>"ASCII" }
       }
     }
     filter {
@@ -44,12 +44,12 @@ data:
       }
     }
     output {
+      stdout { codec => plain }
       elasticsearch {
-        index => "logstash-%{[@metadata][syslog]-%{+YYYY.MM.dd}}"
+        index => "logstash-syslog-%{+YYYY.MM.dd}"
         hosts => [ "${ES_HOSTS}" ]
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
-        document_type => "%{[@metadata][type]}"
         ssl_verification_mode => none
       }
     }
@@ -62,11 +62,10 @@ data:
     }
     output {
       elasticsearch {
-        index => "logstash-%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+        index => "logstash-beats-%{+YYYY.MM.dd}"
         hosts => [ "${ES_HOSTS}" ]
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
-        document_type => "%{[@metadata][type]}"
         ssl_verification_mode => none
       }
     }
@@ -74,23 +73,29 @@ data:
     # HTTP/S event collector
     input {
       http {
-        port => 7080
+        id => "http"
+        host => "0.0.0.0"
+        port => "7080"
+        type => hec
         ssl_enabled => false
       }
-      https {
-        port => 7443
-        ssl_enabled => true
-        ssl_key => default.key
-        ssl_certificate => default.crt
-      }
-    }
+    }  
+    #  http {
+    #    id => "https"
+    #    host => "0.0.0.0"
+    #    port => "7443"
+    #    type => hec
+    #    ssl_enabled => true
+    #    ssl_key => /usr/share/logstash/config/default.key
+    #    ssl_certificate => /usr/share/logstash/config/default.crt
+    #  }
+    #}
     output {
       elasticsearch {
-        index => "logstash-%{[@metadata][hec]-%{+YYYY.MM.dd}}"
+        index => "logstash-hec-%{+YYYY.MM.dd}"
         hosts => [ "${ES_HOSTS}" ]
         user => "${ES_USER}"
         password => "${ES_PASSWORD}"
-        document_type => "%{[@metadata][type]}"
         ssl_verification_mode => none
       }
     }
