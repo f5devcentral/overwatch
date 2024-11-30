@@ -1,0 +1,41 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: kibana-ingress-vs
+spec:
+  host: kibana.f5demo.com
+  tls:
+    secret: kibana-tls-secret
+    redirect: 
+      enabled: true
+      code: 302
+      basedOn: scheme
+  routes:
+  - path: /
+    action:
+      pass: kibana-webui
+  upstreams:
+  - name: kibana-webui
+    service: kibana-kb-http
+    port: 5601
+    healthCheck:
+      slow-start: 30s
+      enable: true
+      path: /elastic
+      interval: 20s
+      jitter: 3s
+      fails: 3
+      passes: 3
+      port: 5601
+      tls:
+        enable: false
+      connect-timeout: 10s
+      read-timeout: 10s
+      send-timeout: 10s
+      headers:
+      - name: Host
+        value: kibana.f5demo.com
+      statusMatch: "! 500"
+      mandatory: true
+      persistent: true
+      keepalive-time: 60s

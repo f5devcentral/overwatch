@@ -2,3 +2,6 @@ manifests/ECK/creds.txt
 overwatch.code-workspace
 .gitconfig
 aks-kubeconfig.py
+terraform/az-auto-scaleset/.terraform
+terraform/az-auto-scaleset/.terraform.lock.hcl
+terraform/az-auto-scaleset/terraform.tfstate

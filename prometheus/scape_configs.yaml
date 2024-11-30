@@ -1,0 +1,12 @@
+      - job_name: 'integrations/f5-bigip'  # Name of the scrape job
+        scheme: https  # Use HTTPS for the scrape
+        tls_config:
+          insecure_skip_verify: true  # Skip TLS certificate verification
+        metrics_path: /mgmt/shared/telemetry/pullconsumer/metrics  # Specify the metric path
+        static_configs:
+          - targets:
+            - '10.225.1.101:443'  # Replace with your endpoint hostname and port
+            - '10.225.1.102:443'  # Replace with your endpoint hostname and port
+        basic_auth:
+          username: 'azops'  # Replace with your username
+          password: 'Canada12345'  # Replace with your password

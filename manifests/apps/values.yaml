@@ -33,14 +33,25 @@ grafana:
       nginx:
         url: https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/main/grafana/NGINXPlusICDashboard.json
         datasource: Prometheus
-  dashboards:
-    default:
       bigip:
-        url: https://grafana.com/api/dashboards/12089/revisions/1/download
+        url: https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/dashboards/BigIP-TS.json
         datasource: Prometheus
+      f5ts:
+        json: |
+          { 
+            key: "value"
+          }
 prometheus:
   pushgateway:
     enabled: true
+  persistentVolume:
+    enabled: true
+    mountPath: /prometheus
+    size: 50gi
+    storageClass: managed-csi
+    pvcDeleteOnStsDelete: false
+    pvcDeleteOnStsScale: false
+    existingClaim: grafanadata
   prometheusSpec:
     additionalScrapeConfigs:
       - job_name: 'integrations/f5-bigip'  # Name of the scrape job
@@ -54,4 +65,15 @@ prometheus:
             - '10.225.1.102:443'  # Replace with your endpoint hostname and port
         basic_auth:
           username: 'azops'  # Replace with your username
-          password: 'Canada12345'  # Replace with your password
+          password: 'Canada12345!'  # Replace with your password
+alertmanager:
+  enabled: true
+  persistence:
+    size: 10Gi
+prometheus-node-exporter:
+  enabled: true
+  rbac:
+    pspEnabled: false
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+

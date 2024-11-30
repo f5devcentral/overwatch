@@ -13,12 +13,14 @@ spec:
       labels:
         app: nginx-ingress
         app.kubernetes.io/name: nginx-ingress
-     #annotations:
-       #prometheus.io/scrape: "true"
-       #prometheus.io/port: "9113"
-       #prometheus.io/scheme: http
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9113"
+        prometheus.io/scheme: http
     spec:
       serviceAccountName: nginx-ingress
+      imagePullSecrets:
+        - name: regcred
       automountServiceAccountToken: true
       securityContext:
         seccompProfile:
@@ -33,7 +35,7 @@ spec:
 #      - name: nginx-log
 #        emptyDir: {}
       containers:
-      - image: nginx-plus-ingress:3.7.1
+      - image: private-registry.nginx.com/nginx-ic-nap/nginx-plus-ingress:3.7.2
         imagePullPolicy: IfNotPresent
         name: nginx-plus-ingress
         ports:
@@ -95,12 +97,12 @@ spec:
          #- -default-server-tls-secret=$(POD_NAMESPACE)/default-server-secret
          #- -enable-cert-manager
          #- -enable-external-dns
-         #- -enable-app-protect
+          - -enable-app-protect
          #- -enable-app-protect-dos
          #- -log-level=debug # Enables extensive logging. Useful for troubleshooting. Options include: trace, debug, info, warning, error, fatal
-         #- -log-format=glog # Sets the log format. Options include: glog, json, text
-         #- -enable-prometheus-metrics
-         #- -enable-service-insight
+         #- -log-format=json # Sets the log format. Options include: glog, json, text
+          - -enable-prometheus-metrics
+          - -enable-service-insight
          #- -global-configuration=$(POD_NAMESPACE)/nginx-configuration
 #      initContainers:
 #      - image: nginx/nginx-ingress:3.7.1

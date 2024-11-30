@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-ingress
+  namespace: default
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: nginx-ingress
+  project: {{ .Values.spec.project }}
+  source:
+    chart: nginx-ingress
+    helm:
+      parameters:
+        - name: "controller.nginxStatus.port"
+          value: "9000"
+        - name: "controller.nginxStatus.allowCidrs"
+          value: "0.0.0.0/0"
+        - name: "controller.enableSnippets"
+          value: "true"
+        - name: "controller.service.customPorts[0].port"
+          value: "9000"
+        - name: "controller.service.customPorts[0].targetPort"
+          value: "9000"
+        - name: "controller.service.customPorts[0].nodePort"
+          value: "32000"
+        - name: "controller.service.customPorts[0].protocol"
+          value: "TCP"
+        - name: "controller.service.customPorts[0].name"
+          value: "nginx-status"
+        - name: "prometheus.create"
+          value: "true"
+    repoURL: https://helm.nginx.com/stable
+    targetRevision: 0.16.2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false

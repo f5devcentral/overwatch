@@ -1,0 +1,23 @@
+# BIG-IP Environment
+f5_username = "azureuser"
+f5_password = "Default12345!"
+ssh_key     = "~/.ssh/id_rsa.pub"
+vnet_rg     = "myVnetRg"
+vnet_name   = "myVnet123"
+mgmtSubnet  = "mgmt"
+extSubnet   = "external"
+intSubnet   = "internal"
+mgmtNsg     = "mgmtNsg"
+extNsg      = "extNsg"
+intNsg      = "intNsg"
+
+# Azure Environment
+location      = "westus2"
+projectPrefix = "mydemo123"
+resourceOwner = "myLastName"
+
+# Key Vault - Uncomment to use Key Vault integration
+#az_keyvault_authentication = true
+#keyvault_rg                = "myKv-rg-123"
+#keyvault_name              = "myKv-123"
+#user_identity              = "/subscriptions/xxxx/resourceGroups/myRg123/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myManagedId123"

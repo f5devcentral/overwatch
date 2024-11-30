@@ -15,7 +15,7 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 5Gi
+            storage: 50Gi
         storageClassName: managed-csi
     config:
       node.store.allow_mmap: false

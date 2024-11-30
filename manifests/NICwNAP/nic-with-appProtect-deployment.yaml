@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-ingress
-  namespace: nginx-ingress
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -13,10 +13,10 @@ spec:
       labels:
         app: nginx-ingress
         app.kubernetes.io/name: nginx-ingress
-     #annotations:
-       #prometheus.io/scrape: "true"
-       #prometheus.io/port: "9113"
-       #prometheus.io/scheme: http
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9113"
+        prometheus.io/scheme: http
     spec:
       serviceAccountName: nginx-ingress
       automountServiceAccountToken: true
@@ -92,9 +92,9 @@ spec:
          #- -default-server-tls-secret=$(POD_NAMESPACE)/default-server-secret
          #- -enable-cert-manager
          #- -enable-external-dns
-         #- -log-level=debug # Enables extensive logging. Useful for troubleshooting. Options include: trace, debug, info, warning, error, fatal
+          - -log-level=debug # Enables extensive logging. Useful for troubleshooting. Options include: trace, debug, info, warning, error, fatal
          #- -log-format=glog # Sets the log format. Options include: glog, json, text
-         #- -enable-prometheus-metrics
+          - -enable-prometheus-metrics
          #- -global-configuration=$(POD_NAMESPACE)/nginx-configuration
 #      initContainers:
 #      - image: nginx/nginx-ingress:3.7.1
