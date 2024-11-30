@@ -7,4 +7,9 @@ terraform/az-auto-scaleset/.terraform.lock.hcl
 terraform/az-auto-scaleset/terraform.tfstate
 terraform/az-auto-scaleset/.terraform.tfstate.lock.info
 terraform/az-auto-scaleset/terraform.tfstate.backup
-
+terraform/az-aks-cluster/.terraform.lock.hcl
+terraform/az-aks-cluster/.terraform
+terraform/az-aks-cluster/terraform.tfstate
+terraform/az-aks-cluster/.terraform.tfstate.lock.info
+terraform/az-aks-cluster/terraform.tfstate.backup
+terraform/az-auto-scaleset/terraform.tfstate.backup
