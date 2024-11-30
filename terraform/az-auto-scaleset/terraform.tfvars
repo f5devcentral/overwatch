@@ -12,8 +12,8 @@ extNsg      = "extNsg"
 intNsg      = "intNsg"
 
 # Azure Environment
-location      = "canadaeast"
-projectPrefix = "Overwatch"
+location      = "canadacentral"
+projectPrefix = "Sentinal"
 resourceOwner = "s.hillier@f5.com"
 
 

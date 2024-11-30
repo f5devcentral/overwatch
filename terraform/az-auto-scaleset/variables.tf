@@ -52,12 +52,12 @@ variable "intNsg" {
 }
 variable "instance_type" {
   type        = string
-  default     = "Standard_DS4_v2"
+  default     = "Standard_DS5_v2"
   description = "Azure instance type to be used for the BIG-IP VE"
 }
 variable "image_name" {
   type        = string
-  default     = "f5-big-best-plus-hourly-25mbps"
+  default     = "f5-big-best-plus-hourly-10gbps"
   description = "F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****."
 }
 variable "product" {
@@ -67,7 +67,7 @@ variable "product" {
 }
 variable "bigip_version" {
   type        = string
-  default     = "16.1.303000"
+  default     = "17.1.1040100"
   description = "BIG-IP Version"
 }
 variable "f5_username" {

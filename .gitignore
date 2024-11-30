@@ -5,3 +5,6 @@ aks-kubeconfig.py
 terraform/az-auto-scaleset/.terraform
 terraform/az-auto-scaleset/.terraform.lock.hcl
 terraform/az-auto-scaleset/terraform.tfstate
+terraform/az-auto-scaleset/.terraform.tfstate.lock.info
+terraform/az-auto-scaleset/terraform.tfstate.backup
+
