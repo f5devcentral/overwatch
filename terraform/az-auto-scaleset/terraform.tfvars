@@ -18,7 +18,8 @@ resourceOwner = "s.hillier@f5.com"
 
 
 instance_type = "Standard_DS5_v2"
-image_name = "f5-big-best-plus-hourly-10gbps"
+product = "f5-big-ip-byol"
+image_name = "f5-big-all-2slot-byol"
 bigip_version = "17.1.1040100"
 
 #Network

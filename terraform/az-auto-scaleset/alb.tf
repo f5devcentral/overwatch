@@ -3,9 +3,9 @@
 # Create Public IPs
 resource "azurerm_public_ip" "lbpip" {
   name                = format("%s-lb-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  resource_group_name = azurerm_resource_group.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
   domain_name_label   = "overwatch-lbpip"
   tags = {
@@ -16,9 +16,9 @@ resource "azurerm_public_ip" "lbpip" {
 # Create Azure LB
 resource "azurerm_lb" "lb" {
   name                = format("%s-lb-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  resource_group_name = azurerm_resource_group.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
 
   frontend_ip_configuration {
     name                 = "LoadBalancerFrontEnd"

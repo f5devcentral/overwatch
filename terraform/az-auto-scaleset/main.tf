@@ -11,22 +11,18 @@ resource "random_id" "buildSuffix" {
   byte_length = 2
 }
 
-# Create a Resource Group for BIG-IP
-resource "azurerm_resource_group" "main" {
-  name     = format("%s-rg-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location = var.location
-  tags = {
-    owner = var.resourceOwner
-  }
+# Existing Resource Group for BIG-IP
+data azurerm_resource_group "main" {
+  name = var.vnet_rg
 }
 
 # Create Log Analytic Workspace
 resource "azurerm_log_analytics_workspace" "main" {
   name                = format("%s-law-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  sku                 = "PerNode"
-  retention_in_days   = 300
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  sku                 = "PerGB2018"
+  retention_in_days   = 90
+  resource_group_name = data.azurerm_resource_group.main.name
+  location            = data.azurerm_resource_group.main.location
   tags = {
     owner = var.resourceOwner
   }

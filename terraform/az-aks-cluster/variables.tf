@@ -16,6 +16,12 @@ variable "resource_group_name" {
   description = "Prefix of the resource group name that's combined with a random ID so name is unique in your Azure subscription."
 }
 
+variable "cluster_name" {
+  type = string
+  default = "aks-Sentinel"
+  description = "Prefix of the AKS cluster to instantiate"
+}
+
 variable "node_count" {
   type        = number
   description = "The initial quantity of nodes for the node pool."
@@ -31,5 +37,11 @@ variable "msi_id" {
 variable "username" {
   type        = string
   description = "The admin username for the new cluster."
-  default     = "azureadmin"
+  default     = "azops"
+}
+
+variable "password" {
+  type = string
+  default = "Default12345!"
+  description = "The admin password for the new cluster"
 }

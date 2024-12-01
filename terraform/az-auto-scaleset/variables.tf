@@ -57,7 +57,7 @@ variable "instance_type" {
 }
 variable "image_name" {
   type        = string
-  default     = "f5-big-best-plus-hourly-10gbps"
+  default     = "f5-big-best-plus-byol-10gbps"
   description = "F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****."
 }
 variable "product" {

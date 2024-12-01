@@ -149,6 +149,10 @@ extension_services:
             ui.advisory.enabled: true
             ui.advisory.color: blue
             ui.advisory.text: '{{{ HOST_NAME }}}.${dns_suffix}'
+          myLicense:
+            class: License
+            licenseType: regKey
+            regKey: 'BZXSX-LYPHZ-TEKLZ-AVHSP-HEDCCDW'
           mySystem:
             autoPhonehome: true
             class: System
@@ -159,6 +163,16 @@ extension_services:
               all-partitions:
                 role: admin
             password: '{{{ ADMIN_PASS }}}'
+            shell: bash
+            userType: regular
+            keys:
+              - '{{{ SSH_KEYS }}}'
+          steveh:
+            class: User
+            partitionAccess:
+              all-partitions:
+                role: admin
+            password: Steveh123456
             shell: bash
             userType: regular
             keys:
@@ -262,3 +276,11 @@ bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
+
+# Emergency Admin Access
+echo "set creds"
+cat <<-EOF | tmsh -q
+create cli transaction;
+create /auth user apiuser password apiuser shell bash partition-access replace-all-with { all-partitions { role admin } };
+submit cli transaction
+EOF

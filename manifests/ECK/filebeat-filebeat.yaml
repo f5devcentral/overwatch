@@ -74,16 +74,16 @@ spec:
         volumes:
         - name: varlogcontainers
           persistentVolumeClaim:
-            claimName: configdata
+            claimName: config-data
           hostPath:
             path: /var/log/containers
         - name: varlogpods
           persistentVolumeClaim:
-            claimName: configdata
+            claimName: config-data
           hostPath:
             path: /var/log/pods
         - name: varlibdockercontainers
           persistentVolumeClaim:
-            claimName: configdata
+            claimName: config-data
           hostPath:
             path: /var/lib/docker/containers

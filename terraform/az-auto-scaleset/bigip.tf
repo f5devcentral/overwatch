@@ -42,23 +42,29 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine_scale_set" "f5vmss" {
-  name                 = format("%s-f5vmss-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location             = azurerm_resource_group.main.location
-  resource_group_name  = azurerm_resource_group.main.name
+  name                 = format("f5vmss-%s", var.projectPrefix)
+  location             = data.azurerm_resource_group.main.location
+  resource_group_name  = data.azurerm_resource_group.main.name
   sku                  = var.instance_type
   instances            = 2
   admin_username       = var.f5_username
-  computer_name_prefix = var.vm_name == "" ? "${var.projectPrefix}f5vm" : var.vm_name
+  admin_password       = var.f5_password
+  disable_password_authentication = false
+  computer_name_prefix = var.vm_name == "" ? "f5vm-${var.projectPrefix}" : var.vm_name
   custom_data          = base64encode(local.f5_onboard1)
 
-  admin_ssh_key {
-    public_key = file(var.ssh_key)
-    username   = var.f5_username
-  }
+  #admin_ssh_key {
+  #  public_key = file(var.ssh_key)
+  #  username   = var.f5_username
+  #}
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
+  }
+
+  boot_diagnostics {
+    storage_account_uri = null
   }
 
   source_image_reference {
