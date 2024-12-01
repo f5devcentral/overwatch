@@ -46,12 +46,81 @@ resource "azurerm_lb_probe" "lb_probe" {
 }
 
 # Create frontend LB rule
-resource "azurerm_lb_rule" "lb_rule1" {
-  name                           = "LBRule1"
+resource "azurerm_lb_rule" "lb_rule-http" {
+  name                           = "LBRule-HTTP"
   loadbalancer_id                = azurerm_lb.lb.id
   protocol                       = "Tcp"
   frontend_port                  = 80
   backend_port                   = 80
+  frontend_ip_configuration_name = "LoadBalancerFrontEnd"
+  enable_floating_ip             = false
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  idle_timeout_in_minutes        = 5
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+# Create frontend LB rule
+resource "azurerm_lb_rule" "lb_rule-https" {
+  name                           = "LBRule-HTTPS"
+  loadbalancer_id                = azurerm_lb.lb.id
+  protocol                       = "Tcp"
+  frontend_port                  = 443
+  backend_port                   = 443
+  frontend_ip_configuration_name = "LoadBalancerFrontEnd"
+  enable_floating_ip             = false
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  idle_timeout_in_minutes        = 5
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+# Create frontend LB rule
+resource "azurerm_lb_rule" "lb_rule-syslogTcp" {
+  name                           = "LBRule-Syslog-TCP"
+  loadbalancer_id                = azurerm_lb.lb.id
+  protocol                       = "Tcp"
+  frontend_port                  = 7514
+  backend_port                   = 7514
+  frontend_ip_configuration_name = "LoadBalancerFrontEnd"
+  enable_floating_ip             = false
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  idle_timeout_in_minutes        = 5
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+# Create frontend LB rule
+resource "azurerm_lb_rule" "lb_rule-syslogUdp" {
+  name                           = "LBRule1"
+  loadbalancer_id                = azurerm_lb.lb.id
+  protocol                       = "Udp"
+  frontend_port                  = 7514
+  backend_port                   = 7514
+  frontend_ip_configuration_name = "LoadBalancerFrontEnd"
+  enable_floating_ip             = false
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  idle_timeout_in_minutes        = 5
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+resource "azurerm_lb_rule" "lb_rule-hec" {
+  name                           = "LBRule-HEC"
+  loadbalancer_id                = azurerm_lb.lb.id
+  protocol                       = "Tcp"
+  frontend_port                  = 7080
+  backend_port                   = 7080
+  frontend_ip_configuration_name = "LoadBalancerFrontEnd"
+  enable_floating_ip             = false
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  idle_timeout_in_minutes        = 5
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+# Create frontend LB rule
+resource "azurerm_lb_rule" "lb_rule-beats" {
+  name                           = "LBRule-HECS"
+  loadbalancer_id                = azurerm_lb.lb.id
+  protocol                       = "Tcp"
+  frontend_port                  = 7443
+  backend_port                   = 7443
   frontend_ip_configuration_name = "LoadBalancerFrontEnd"
   enable_floating_ip             = false
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]

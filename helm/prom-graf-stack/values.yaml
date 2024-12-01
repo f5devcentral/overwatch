@@ -36,11 +36,6 @@ grafana:
       bigip:
         url: https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/dashboards/BigIP-TS.json
         datasource: Prometheus
-      f5ts:
-        json: |
-          { 
-            key: "value"
-          }
 prometheus:
   pushgateway:
     enabled: true
@@ -61,11 +56,13 @@ prometheus:
         metrics_path: /mgmt/shared/telemetry/pullconsumer/metrics  # Specify the metric path
         static_configs:
           - targets:
-            - '10.225.1.101:443'  # Replace with your endpoint hostname and port
-            - '10.225.1.102:443'  # Replace with your endpoint hostname and port
+            - '10.127.254.5:443'  # Replace with your endpoint hostname and port
+            - '10.127.254.6:443'  # Replace with your endpoint hostname and port
+            - '52.156.19.216:443'  # Replace with your endpoint hostname and port
+            - '52.156.19.160:443'  # Replace with your endpoint hostname and port
         basic_auth:
           username: 'azops'  # Replace with your username
-          password: 'Canada12345!'  # Replace with your password
+          password: 'Canada123456'  # Replace with your password
 alertmanager:
   enabled: true
   persistence:

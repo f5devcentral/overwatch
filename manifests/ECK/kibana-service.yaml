@@ -3,15 +3,15 @@ kind: Service
 metadata:
   name: kibana
   labels:
-    component: kibana
+    component: eck-stack-with-logstash-eck-kibana
     role: kibana
 spec:
   type: LoadBalancer
   selector:
-    component: kibana
+    component: eck-stack-with-logstash-eck-kibana
     role: kibana
   ports:
   - name: http
-    port: 8099
+    port: 5601
     targetPort: 5601
     protocol: TCP

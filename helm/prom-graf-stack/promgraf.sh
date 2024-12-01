@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# installation type flag; default = global
-installType = 'global'
-
 # add helm repo
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
