@@ -9,4 +9,4 @@
             - '10.225.1.102:443'  # Replace with your endpoint hostname and port
         basic_auth:
           username: 'azops'  # Replace with your username
-          password: 'Canada12345'  # Replace with your password
+          password: 'Default12345'  # Replace with your password

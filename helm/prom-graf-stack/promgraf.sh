@@ -7,5 +7,7 @@ helm repo update
 # install prometheus-grafana stack
 helm upgrade --install -f values.yaml grafana-labs-stack prometheus-community/kube-prometheus-stack
 
-# show config opts
-helm show values prometheus-community/kube-prometheus-stack
+# show grfana admin creds
+echo "Username: admin"
+echo "Password: `kubectl get secret grafana -n elastic-system -o jsonpath="{.data.admin-password}" |base64 -d`"
+echo ""

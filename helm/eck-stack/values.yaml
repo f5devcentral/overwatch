@@ -72,19 +72,19 @@ eck-beats:
       output.logstash:
         # This needs to be {{logstash-name}}-ls-beats:5044
         hosts: ["logstash-ls-beats-ls-beats:5044"]
+      extraEnvs:
+      - name: ES_HOSTS
+        value: "https://elasticsearch-es-http:9200"
+      - name: ES_USER
+        value: "elastic"
+      - name: ES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: elasticsearch-es-elastic-user
+            key: elastic
     deployment:
       podTemplate:
         spec:
-        extraEnvs:
-        - name: ES_HOSTS
-          value: "https://elasticsearch-es-http:9200"
-        - name: ES_USER
-          value: "elastic"
-        - name: ES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: elasticsearch-es-elastic-user
-              key: elastic
           automountServiceAccountToken: true
           initContainers:
             - name: download-tutorial

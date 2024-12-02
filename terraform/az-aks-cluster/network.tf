@@ -27,7 +27,7 @@ resource "azurerm_nat_gateway_public_ip_association" "example" {
 
 # Associate NAT Gateway with Subnet
 resource "azurerm_subnet_nat_gateway_association" "example" {
-  subnet_id      = azurerm_subnet.aks-subnet.id
+  subnet_id      = azurerm_subnet.aks-aci-subnet.id
   nat_gateway_id = azurerm_nat_gateway.my_nat_gateway.id
 }
 

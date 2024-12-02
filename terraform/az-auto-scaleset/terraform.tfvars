@@ -1,6 +1,6 @@
 # BIG-IP Environment
 f5_username = "azops"
-f5_password = "Canada123456"
+f5_password = "Default123456"
 ssh_key     = "~/.ssh/id_rsa.pub"
 vnet_rg     = "sh-Overwatch"
 vnet_name   = "Overwatch-subnet"

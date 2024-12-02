@@ -63,7 +63,7 @@ prometheus:
             - '52.156.19.160:443'  # Replace with your endpoint hostname and port
         basic_auth:
           username: 'azops'  # Replace with your username
-          password: 'Canada123456'  # Replace with your password
+          password: 'Default123456'  # Replace with your password
 alertmanager:
   enabled: true
   persistence:
