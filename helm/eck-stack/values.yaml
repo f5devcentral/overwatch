@@ -47,6 +47,16 @@ eck-kibana:
         spec:
           type: LoadBalancer
           port: 5601
+    extraEnvs:
+    - name: ES_HOSTS
+      value: "https://elasticsearch-es-http:9200"
+    - name: ES_USER
+      value: "elastic"
+    - name: ES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-es-elastic-user
+          key: elastic
 eck-beats:
   enabled: true
   spec:
@@ -66,6 +76,16 @@ eck-beats:
     deployment:
       podTemplate:
         spec:
+        extraEnvs:
+        - name: ES_HOSTS
+          value: "https://elasticsearch-es-http:9200"
+        - name: ES_USER
+          value: "elastic"
+        - name: ES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: elasticsearch-es-elastic-user
+              key: elastic
           automountServiceAccountToken: true
           initContainers:
             - name: download-tutorial
@@ -103,6 +123,16 @@ eck-logstash:
   - metadata:
       name: elasticsearch-data # Do not change this name unless you set up a corresponding persistentVolumeClaim to fulfill the request.
     spec:
+    extraEnvs:
+    - name: ES_HOSTS
+      value: "https://elasticsearch-es-http:9200"
+    - name: ES_USER
+      value: "elastic"
+    - name: ES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-es-elastic-user
+          key: elastic
       accessModes:
       - ReadWriteOnce
       resources:
