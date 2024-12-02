@@ -73,4 +73,3 @@ prometheus-node-exporter:
     pspEnabled: false
   containerSecurityContext:
     allowPrivilegeEscalation: false
-
