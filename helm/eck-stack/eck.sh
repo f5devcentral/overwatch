@@ -16,4 +16,6 @@ kubectl apply -n elastic-system -f max-map-counter-setter.yaml
 helm upgrade --install elk-stack elastic/eck-stack -n elastic-system --create-namespace --values ./values.yaml
 
 # show elastic-operator logs
-kubectl -n elastic-system logs -f statefulset.apps/elastic-operator
+echo "Username: elastic"
+echo "Password: `kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o jsonpath="{.data.elastic}" |base64 -d`"
+echo ""
