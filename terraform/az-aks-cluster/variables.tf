@@ -22,10 +22,16 @@ variable "aks_vnet" {
   description = "Vnet in which to instantiate AKS subnet"
 }
 
-variable "aks_subnet" {
+variable "aks_node_subnet" {
   type = string
-  default = "aks-subnet"
-  description = "name of AKS subnet to instantiate"
+  default = "aks-node-subnet"
+  description = "name of AKS node subnet to instantiate"
+}
+
+variable "aks_aci_subnet" {
+  type = string
+  default = "aks-aci-subnet"
+  description = "name of AKS CNI subnet to instantiate"
 }
 
 variable "cluster_name" {

@@ -38,6 +38,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     name       = "aksnodepool"
     vm_size    = "Standard_DS5_v2"
     node_count = var.node_count
+    vnet_subnet_id = azurerm_subnet.aks-node-subnet.id
   }
   linux_profile {
     admin_username = var.username
@@ -47,10 +48,13 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     }
   }
   aci_connector_linux {
-    subnet_name = azurerm_subnet.aks-subnet.name
+    subnet_name = azurerm_subnet.aks-aci-subnet.name
   }
   network_profile {
     network_plugin    = "azure"
+    network_policy = "azure"
     load_balancer_sku = "standard"
   }
+  azure_policy_enabled             = false
+  http_application_routing_enabled = false
 }
