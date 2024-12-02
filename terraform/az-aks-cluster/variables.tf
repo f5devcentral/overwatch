@@ -16,6 +16,18 @@ variable "resource_group_name" {
   description = "Prefix of the resource group name that's combined with a random ID so name is unique in your Azure subscription."
 }
 
+variable "aks_vnet" {
+  type = string
+  default = "Overwatch-subnet"
+  description = "Vnet in which to instantiate AKS subnet"
+}
+
+variable "aks_subnet" {
+  type = string
+  default = "aks-subnet"
+  description = "name of AKS subnet to instantiate"
+}
+
 variable "cluster_name" {
   type = string
   default = "aks-Sentinel"

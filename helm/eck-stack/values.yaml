@@ -20,7 +20,7 @@ eck-elasticsearch:
       # and leave node.store.allow_mmap unset.
       # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
       #
-      #node.store.allow_mmap: false
+      #node.store.allow_mmap: false    
     podTemplate:
       spec:
         #This init container ensures that max_map_count setting is applied before starting Elasticsearch
@@ -34,6 +34,8 @@ eck-elasticsearch:
               memory: 8Gi
             requests:
               memory: 8Gi
+    service:
+      type: LoadBalancer
 eck-kibana:
   enabled: true
   spec:
@@ -48,6 +50,7 @@ eck-kibana:
         spec:
           type: LoadBalancer
           port: 5601
+          targetPort: 5601
 eck-beats:
   enabled: true
   spec:

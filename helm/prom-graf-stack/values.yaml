@@ -6,7 +6,8 @@ grafana:
     type: pvc
     accessModes:
       - ReadWriteOnce
-    size: 4Gi
+    size: 50gi
+    storageClassName: managed-csi
     finalizers:
       - kubernetes.io/pvc-protection
   datasources:
@@ -66,7 +67,14 @@ prometheus:
 alertmanager:
   enabled: true
   persistence:
-    size: 10Gi
+    enabled: true
+    type: pvc
+    accessModes:
+      - ReadWriteOnce
+    size: 10gi
+    storageClassName: managed-csi
+    finalizers:
+      - kubernetes.io/pvc-protection
 prometheus-node-exporter:
   enabled: true
   rbac:

@@ -34,7 +34,6 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   identity {
     type = "SystemAssigned"
   }
-
   default_node_pool {
     name       = "aksnodepool"
     vm_size    = "Standard_DS5_v2"
@@ -46,6 +45,9 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     ssh_key {
       key_data = azapi_resource_action.ssh_public_key_gen.output.publicKey
     }
+  }
+  aci_connector_linux {
+    subnet_name = azurerm_subnet.aks-subnet.name
   }
   network_profile {
     network_plugin    = "azure"
