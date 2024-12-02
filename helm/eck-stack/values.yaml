@@ -12,7 +12,7 @@ eck-elasticsearch:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 20Gi
+            storage: 10Gi
         storageClassName: managed-csi
     config:
       # Comment out when setting the vm.max_map_count via initContainer, as these are mutually exclusive.
@@ -40,14 +40,9 @@ eck-kibana:
     count: 1
     elasticsearchRef:
       name: elasticsearch
-  http:
     service:
-      spec:
-        type: LoadBalancer # default is ClusterIP
-    tls:
-      selfSignedCertificate:
-        subjectAltNames:
-          disabled: true
+      type: LoadBalancer # default is ClusterIP
+      port: 5601
 eck-beats:
   enabled: true
   spec:
@@ -100,6 +95,16 @@ eck-logstash:
     # used in the below config.string output section.
     - clusterName: eck
       name: elasticsearch
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data # Do not change this name unless you set up a corresponding persistentVolumeClaim to fulfill the request.
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: managed-csi
   pipelines:
     - pipeline.id: http
       config.string: |
