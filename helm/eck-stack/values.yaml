@@ -46,7 +46,6 @@ eck-kibana:
       service:
         spec:
           type: LoadBalancer
-          port: 5601
     extraEnvs:
     - name: ES_HOSTS
       value: "https://elasticsearch-es-http:9200"
@@ -119,11 +118,7 @@ eck-logstash:
     # used in the below config.string output section.
     - clusterName: eck
       name: elasticsearch
-  volumeClaimTemplates:
-  - metadata:
-      name: elasticsearch-data # Do not change this name unless you set up a corresponding persistentVolumeClaim to fulfill the request.
-    spec:
-    extraEnvs:
+  extraEnvs:
     - name: ES_HOSTS
       value: "https://elasticsearch-es-http:9200"
     - name: ES_USER
@@ -133,6 +128,10 @@ eck-logstash:
         secretKeyRef:
           name: elasticsearch-es-elastic-user
           key: elastic
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data # Do not change this name unless you set up a corresponding persistentVolumeClaim to fulfill the request.
+    spec:
       accessModes:
       - ReadWriteOnce
       resources:
