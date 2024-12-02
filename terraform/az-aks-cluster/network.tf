@@ -35,7 +35,7 @@ resource azurerm_subnet "aks-subnet" {
   resource_group_name = var.resource_group_name
   name = var.aks_subnet
   virtual_network_name = var.aks_vnet
-  address_prefixes = ["10.112.0.0/15"]
+  address_prefixes = ["10.112.0.0/16"]
   delegation {
     name = "aciDelegation"
     service_delegation {
