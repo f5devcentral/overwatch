@@ -40,9 +40,14 @@ eck-kibana:
     count: 1
     elasticsearchRef:
       name: elasticsearch
-    service:
-      type: LoadBalancer # default is ClusterIP
-      port: 5601
+    http:
+      service:
+        metadata:
+          annotations:
+            service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+        spec:
+          type: LoadBalancer
+          port: 5601
 eck-beats:
   enabled: true
   spec:
