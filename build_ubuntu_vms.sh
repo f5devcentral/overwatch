@@ -34,8 +34,14 @@ sudo systemctl enable docker
 # AZ CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# Unminimize the minimal ubuntu 22.04 LTS image
-#sudo unminimize -y
+
+
+sudo cat <<-EOF >> /etc/rsyslog.d/50-default.conf
+*.*  action(type="omfwd" target="192.0.2.2" port="7514" protocol="tcp"
+            action.resumeRetryCount="100"
+            queue.type="linkedList" queue.size="10000")
+EOF
+sudo systemctl restart rsyslogd
 
 
 

@@ -60,6 +60,6 @@ variable "username" {
 
 variable "password" {
   type = string
-  default = "Default12345!"
+  default = "Canada12345!"
   description = "The admin password for the new cluster"
 }

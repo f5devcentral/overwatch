@@ -47,13 +47,12 @@ resource "azurerm_kubernetes_cluster" "k8s" {
       key_data = azapi_resource_action.ssh_public_key_gen.output.publicKey
     }
   }
-  aci_connector_linux {
-    subnet_name = azurerm_subnet.aks-aci-subnet.name
-  }
   network_profile {
     network_plugin    = "azure"
     network_policy = "azure"
     load_balancer_sku = "standard"
+    service_cidr = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
   }
   azure_policy_enabled             = false
   http_application_routing_enabled = false

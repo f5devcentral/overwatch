@@ -9,4 +9,25 @@
             - '10.225.1.102:443'  # Replace with your endpoint hostname and port
         basic_auth:
           username: 'azops'  # Replace with your username
-          password: 'Default12345'  # Replace with your password
+          password: 'Canada12345'  # Replace with your password
+      - job_name: cis
+        scrape_interval: 10s
+        metrics_path: '/metrics'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: k8s_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: k8s_pod_name
+          - source_labels: [__address__]
+            action: replace
+            regex: ([^:]+)(?::\d+)?
+            replacement: ${1}:8080
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: k8s-bigip-ctlr
+        

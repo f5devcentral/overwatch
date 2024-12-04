@@ -5,8 +5,8 @@
       "label": "Graphite Datasource",
       "description": "Graphite with StatsD metrics collected from F5 BIG-IP",
       "type": "datasource",
-      "pluginId": "graphite",
-      "pluginName": "Graphite"
+      "pluginId": "Prometheus",
+      "pluginName": "Prometheus"
     }
   ],
   "__requires": [
@@ -24,8 +24,8 @@
     },
     {
       "type": "datasource",
-      "id": "graphite",
-      "name": "Graphite",
+      "id": "prometheus",
+      "name": "Prometheus",
       "version": "1.0.0"
     },
     {

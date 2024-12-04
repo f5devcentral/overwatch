@@ -77,7 +77,7 @@ variable "f5_username" {
 }
 variable "f5_password" {
   type        = string
-  default     = "Default12345!"
+  default     = "Canada12345!"
   description = "BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az_key_vault_authentication = true, ex. my-bigip-secret)"
 }
 variable "az_keyvault_authentication" {
@@ -171,7 +171,7 @@ variable "bigIqUsername" {
 }
 variable "bigIqPassword" {
   type        = string
-  default     = "Default12345!"
+  default     = "Canada12345!"
   description = "Admin Password for BIG-IQ"
 }
 variable "bigIqLicenseType" {

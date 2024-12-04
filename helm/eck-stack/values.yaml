@@ -46,16 +46,6 @@ eck-kibana:
       service:
         spec:
           type: LoadBalancer
-    extraEnvs:
-    - name: ES_HOSTS
-      value: "https://elasticsearch-es-http:9200"
-    - name: ES_USER
-      value: "elastic"
-    - name: ES_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: elasticsearch-es-elastic-user
-          key: elastic
 eck-beats:
   enabled: true
   spec:
@@ -72,16 +62,6 @@ eck-beats:
       output.logstash:
         # This needs to be {{logstash-name}}-ls-beats:5044
         hosts: ["logstash-ls-beats-ls-beats:5044"]
-      extraEnvs:
-      - name: ES_HOSTS
-        value: "https://elasticsearch-es-http:9200"
-      - name: ES_USER
-        value: "elastic"
-      - name: ES_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: elasticsearch-es-elastic-user
-            key: elastic
     deployment:
       podTemplate:
         spec:
@@ -118,16 +98,6 @@ eck-logstash:
     # used in the below config.string output section.
     - clusterName: eck
       name: elasticsearch
-  extraEnvs:
-    - name: ES_HOSTS
-      value: "https://elasticsearch-es-http:9200"
-    - name: ES_USER
-      value: "elastic"
-    - name: ES_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: elasticsearch-es-elastic-user
-          key: elastic
   volumeClaimTemplates:
   - metadata:
       name: elasticsearch-data # Do not change this name unless you set up a corresponding persistentVolumeClaim to fulfill the request.
@@ -154,10 +124,11 @@ eck-logstash:
         output {
           elasticsearch {
             index => "logstash-hec-%{+YYYY.MM.dd}"
-            hosts => [ "${ES_HOSTS}" ]
-            user => "${ES_USER}"
-            password => "${ES_PASSWORD}"
+            hosts => [ "${ECK_ES_HOSTS}" ]
+            user => "${ECK_ES_USER}"
+            password => "${ECK_ES_PASSWORD}"
             ssl_verification_mode => none
+            #ssl_certificate_authorities => "${ECK_ES_SSL_CERTIFICATE_AUTHORITY}"
           }
         }
     - pipeline.id: syslog
@@ -191,10 +162,11 @@ eck-logstash:
           stdout { codec => plain }
           elasticsearch {
             index => "logstash-syslog-%{+YYYY.MM.dd}"
-            hosts => [ "${ES_HOSTS}" ]
-            user => "${ES_USER}"
-            password => "${ES_PASSWORD}"
+            hosts => [ "${ECK_ES_HOSTS}" ]
+            user => "${ECK_ES_USER}"
+            password => "${ECK_ES_PASSWORD}"
             ssl_verification_mode => none
+            #ssl_certificate_authorities => "${ECK_ES_SSL_CERTIFICATE_AUTHORITY}"
           }
         }
     - pipeline.id: main
@@ -219,6 +191,7 @@ eck-logstash:
             hosts => [ "${ECK_ES_HOSTS}" ]
             user => "${ECK_ES_USER}"
             password => "${ECK_ES_PASSWORD}"
+            ssl_verification_mode => none
             #ssl_certificate_authorities => "${ECK_ES_SSL_CERTIFICATE_AUTHORITY}"
           }
         }

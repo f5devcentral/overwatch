@@ -16,7 +16,7 @@ grafana:
       datasources:
         - name: Prometheus
           type: prometheus
-          url: http://kube-prometheus-stack-prometheus:9090
+          url: http://grafana-labs-stack-kube-pr-prometheus:9090
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -37,6 +37,10 @@ grafana:
       bigip:
         url: https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/dashboards/BigIP-TS.json
         datasource: Prometheus
+      f5bigip:
+        url: https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/dashboards/TS.json
+        datasource: Prometheus
+      f5cis: 
 prometheus:
   pushgateway:
     enabled: true
@@ -52,6 +56,8 @@ prometheus:
     additionalScrapeConfigs:
       - job_name: 'integrations/f5-bigip'  # Name of the scrape job
         scheme: https  # Use HTTPS for the scrape
+        scrape_timeout: 30s
+        scrape_interval: 60s
         tls_config:
           insecure_skip_verify: true  # Skip TLS certificate verification
         metrics_path: /mgmt/shared/telemetry/pullconsumer/metrics  # Specify the metric path
@@ -59,11 +65,29 @@ prometheus:
           - targets:
             - '10.127.254.5:443'  # Replace with your endpoint hostname and port
             - '10.127.254.6:443'  # Replace with your endpoint hostname and port
-            - '52.156.19.216:443'  # Replace with your endpoint hostname and port
-            - '52.156.19.160:443'  # Replace with your endpoint hostname and port
         basic_auth:
           username: 'azops'  # Replace with your username
-          password: 'Default123456'  # Replace with your password
+          password: 'Canada123456'  # Replace with your password
+      - job_name: cis
+        scrape_interval: 10s
+        metrics_path: '/metrics'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: k8s_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: k8s_pod_name
+          - source_labels: [__address__]
+            action: replace
+            regex: ([^:]+)(?::\d+)?
+            replacement: ${1}:8080
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: k8s-bigip-ctlr
 alertmanager:
   enabled: true
   persistence:

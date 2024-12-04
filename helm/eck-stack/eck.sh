@@ -5,8 +5,8 @@ helm repo add elastic https://helm.elastic.co
 helm repo update
 
 # install Elastic CRDs and Operator
-helm upgrade --install elastic-operator-crds elastic/eck-operator-crds
-kubectl apply -f https://download.elastic.co/downloads/eck/2.15.0/operator.yaml
+#helm upgrade --install elastic-operator-crds elastic/eck-operator-crds
+helm upgrade --install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
 
 
 # install elasticsearch init container DaemonSet
