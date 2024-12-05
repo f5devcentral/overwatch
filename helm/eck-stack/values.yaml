@@ -31,9 +31,11 @@ eck-elasticsearch:
         - name: elasticsearch
           resources:
             limits:
-              memory: 8Gi
+              memory: 4Gi
+              cpu: 4
             requests:
               memory: 8Gi
+              cpu: 8
     service:
       type: LoadBalancer
 eck-kibana:
@@ -42,6 +44,20 @@ eck-kibana:
     count: 1
     elasticsearchRef:
       name: elasticsearch
+    podTemplate:
+      spec:
+        containers:
+        - name: kibana
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=2048"
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 0.5
+            limits:
+              memory: 2.5Gi
+              cpu: 2
     http:
       service:
         spec:
@@ -76,6 +92,13 @@ eck-beats:
                   mountPath: /data
           containers:
             - name: filebeat
+              resources:
+                requests:
+                  memory: 4Gi
+                  cpu: 2
+                limits:
+                  memory: 8Gi
+                  cpu: 4
               securityContext:
                 runAsUser: 1000
               volumeMounts:
@@ -108,6 +131,22 @@ eck-logstash:
         requests:
           storage: 10Gi
       storageClassName: managed-csi
+  config:
+    #nothing for now
+  podTemplate:
+    spec:
+      containers:
+      - name: logstash
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+          limits:
+            memory: 8Gi
+            cpu: 4
+        env:
+        - name: LS_JAVA_OPTS
+          value: -Xms2000m -Xmx2000m
   pipelines:
     - pipeline.id: http
       config.string: |

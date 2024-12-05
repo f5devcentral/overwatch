@@ -32,19 +32,19 @@ args:
   # openshift_sdn_name:
   # flannel_name:
   # KUBERNETES
-  # default_ingress_ip:
+  default_ingress_ip: 52.156.22.174
   # kubeconfig:
   # namespaces: ["foo", "bar"]
   # namespace_label:
   # node_label_selector:
-  # pool_member_type:
+  pool_member_type: auto
   # resolve_ingress_names:
   # running_in_cluster:
   # use_node_internal:
   # use_secrets:
-  # insecure: true
-  # custom-resource-mode: true
-  # log-as3-response: true
+  insecure: true
+  custom-resource-mode: true
+  log-as3-response: true
   # gtm-bigip-password
   # gtm-bigip-url
   # gtm-bigip-username
@@ -54,7 +54,7 @@ image:
   user: f5networks
   repo: k8s-bigip-ctlr
   pullPolicy: Always
-#  version: latest
+  version: latest
 # affinity:
 #   nodeAffinity:
 #     requiredDuringSchedulingIgnoredDuringExecution:

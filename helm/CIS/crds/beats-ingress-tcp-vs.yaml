@@ -1,0 +1,34 @@
+apiVersion: "cis.f5.com/v1"
+kind: TransportServer
+metadata:
+  labels:
+    f5cr: "true"
+  name: logstash-ingress-beats-vs
+  namespace: elastic-system
+spec:
+  virtualServerAddress: "52.156.22.174"
+  virtualServerPort: 7514
+  virtualServerName: logstash-ingress-beats-vs
+  mode: performance
+  snat: auto
+  allowVlans: ["/Common/external"]
+  persistenceProfile: "destination-address"
+  profileL4: /Common/security-fastL4
+  profiles:
+    tcp:
+      client: /Common/f5-tcp-wan
+      server: /Common/f5-tcp-lan
+  pool:
+    service: logstash-ls-beats-ls-beats
+    servicePort: 7514
+    loadBalancingMethod: fastest-node
+    monitor:
+      type: tcp
+      interval: 10
+      timeout: 10
+    # reselectTries specifies the maximum number of attempts to find a responsive member for a connection
+    # Supported values: [0, 65535]
+    reselectTries: 15
+    # serviceDownAction specifies connection handling when member is non-responsive
+    # Supported values: “drop”, “none”, “reselect”, “reset”
+    serviceDownAction: reselect

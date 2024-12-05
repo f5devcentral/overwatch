@@ -1,0 +1,31 @@
+apiVersion: "cis.f5.com/v1"
+kind: VirtualServer
+metadata:
+  name: logstash-ingress-hec-vs
+  labels:
+    f5cr: "true"
+spec:
+  virtualServerAddress: 52.156.22.174
+  virtualServerPort: 7080
+  virtualServerName: logstash-ingress-hec-vs
+  mode: standard
+  snat: auto
+  allowVlans: ["/Common/external"]
+  persistenceProfile: "destination-address"
+  profiles:
+    tcp:
+      client: /Common/f5-tcp-wan
+      server: /Common/f5-tcp-lan
+  host: logstash-hec.f5demo.com
+  pools:
+  - monitor:
+        interval: 5
+        recv: ""
+        send: /
+        timeout: 15
+        type: http
+  - path: /
+    service: logstash-ls-beats-ls-hec
+    servicePort: 7080
+    reselectTries: 3
+    serviceDownAction: reselect  
