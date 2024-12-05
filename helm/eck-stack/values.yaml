@@ -37,7 +37,7 @@ eck-elasticsearch:
               memory: 8Gi
               cpu: 8
     service:
-      type: LoadBalancer
+      type: ClusterIP
 eck-kibana:
   enabled: true
   spec:
@@ -61,7 +61,7 @@ eck-kibana:
     http:
       service:
         spec:
-          type: LoadBalancer
+          type: ClusterIP
 eck-beats:
   enabled: true
   spec:
@@ -238,7 +238,7 @@ eck-logstash:
     - name: beats
       service:
         spec:
-          type: LoadBalancer
+          type: ClusterIP
           ports:
             - port: 5044
               name: "filebeat"
@@ -247,7 +247,7 @@ eck-logstash:
     - name: syslog-tcp
       service:
         spec:
-          type: LoadBalancer
+          type: ClusterIP
           ports:
             - port: 7514
               name: "syslog-tcp"
@@ -256,7 +256,7 @@ eck-logstash:
     - name: syslog-udp
       service:
         spec:
-          type: LoadBalancer
+          type: ClusterIP
           ports:
             - port: 7514
               name: "syslog-udp"
@@ -265,7 +265,7 @@ eck-logstash:
     - name: hec
       service:
         spec:
-          type: LoadBalancer
+          type: ClusterIP
           ports:
             - port: 7080
               name: "http-event-collector"

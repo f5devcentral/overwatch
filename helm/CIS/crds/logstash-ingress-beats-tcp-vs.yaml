@@ -3,24 +3,27 @@ kind: TransportServer
 metadata:
   labels:
     f5cr: "true"
-  name: logstash-ingress-syslog-udp-vs
+  name: logstash-ingress-beats-vs
   namespace: elastic-system
 spec:
   virtualServerAddress: 52.156.22.174
-  virtualServerPort: 7514
-  virtualServerName: logstash-ingress-syslog-udp-vs
-  type: udp
+  virtualServerPort: 5044
+  virtualServerName: logstash-ingress-beats-vs
   mode: performance
   snat: auto
   allowVlans: ["/Common/external"]
   persistenceProfile: "destination-address"
   profileL4: /Common/security-fastL4
+  profiles:
+    tcp:
+      client: /Common/f5-tcp-wan
+      server: /Common/f5-tcp-lan
   pool:
-    service: logstash-ls-beats-ls-syslog-udp
-    servicePort: 7514
+    service: logstash-ls-beats-ls-beats
+    servicePort: 5044
     loadBalancingMethod: fastest-node
     monitor:
-      type: udp
+      type: tcp
       interval: 5
       timeout: 15
     reselectTries: 3

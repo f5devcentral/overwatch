@@ -1,14 +1,15 @@
 apiVersion: "cis.f5.com/v1"
 kind: VirtualServer
 metadata:
+  namespace: elastic-system
   name: logstash-ingress-hec-vs
   labels:
     f5cr: "true"
 spec:
   virtualServerAddress: 52.156.22.174
-  virtualServerPort: 7080
+  virtualServerHTTPPort: 7080
+  virtualServerHTTPSPort: 7443
   virtualServerName: logstash-ingress-hec-vs
-  mode: standard
   snat: auto
   allowVlans: ["/Common/external"]
   persistenceProfile: "destination-address"
@@ -17,15 +18,64 @@ spec:
       client: /Common/f5-tcp-wan
       server: /Common/f5-tcp-lan
   host: logstash-hec.f5demo.com
+  httpTraffic: allow
+  defaultPool:
+    reference: service
+    service: logstash-ls-beats-ls-hec
+    serviceNamespace: elastic-system
+    loadBalancingMethod: fastest-node
+    servicePort: 7080
+    serviceDownAction: reselect
+    reselectTries: 3
+    monitors:
+     - interval: 5
+       recv: a
+       send: /
+       targetPort: 7080
+       timeout: 15
+       type: tcp
+     - interval: 5
+       recv: a
+       send: /
+       timeout: 15
+       type: http
+     - name: /Common/http
+       reference: bigip
   pools:
-  - monitor:
-        interval: 5
-        recv: ""
-        send: /
-        timeout: 15
-        type: http
   - path: /
     service: logstash-ls-beats-ls-hec
     servicePort: 7080
     reselectTries: 3
-    serviceDownAction: reselect  
+    serviceDownAction: reselect
+    monitors:
+     - interval: 5
+       recv: a
+       send: /
+       targetPort: 7080
+       timeout: 15
+       type: tcp
+     - interval: 5
+       recv: a
+       send: /
+       timeout: 15
+       type: http
+     - name: /Common/http
+       reference: bigip
+  tlsProfileName: terminate-tls13
+---
+apiVersion: cis.f5.com/v1
+kind: TLSProfile
+metadata:
+  name: terminate-tls13
+  labels:
+    f5cr: "true"
+spec:
+  tlsCipher:
+    tlsVersion: "1.3"
+    cipherGroup: /Common/f5-default
+  tls:
+    termination: edge
+    clientSSL: /Common/clientssl
+    reference: bigip
+  hosts:
+  - logstash-hec.f5demo.com
