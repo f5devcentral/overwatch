@@ -32,7 +32,7 @@ args:
   # openshift_sdn_name:
   # flannel_name:
   # KUBERNETES
-  default_ingress_ip: 52.156.22.174
+  default_ingress_ip: 10.127.252.11
   # kubeconfig:
   # namespaces: ["foo", "bar"]
   # namespace_label:
