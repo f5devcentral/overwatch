@@ -55,11 +55,11 @@ variable "msi_id" {
 variable "username" {
   type        = string
   description = "The admin username for the new cluster."
-  default     = "azops"
+  default     = "azureuser"
 }
 
 variable "password" {
   type = string
-  default = "Canada12345!"
+  default = "Default123456"
   description = "The admin password for the new cluster"
 }

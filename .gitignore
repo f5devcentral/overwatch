@@ -15,3 +15,5 @@ terraform/az-aks-cluster/terraform.tfstate.backup
 terraform/az-auto-scaleset/terraform.tfstate.backup
 terraform/az-auto-scaleset/files/as3.json
 terraform/az-auto-scaleset/files/runtime-init.yaml
+terraform/az-auto-scaleset/terraform.tfvars
+terraform/az-aks-cluster/terraform.tfvars
