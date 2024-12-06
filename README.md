@@ -5,9 +5,11 @@ This repo contains all the required manifests and documentation to build a moder
   1. Logstash
   2. ElasticSearch
   3. Kibana
-  4. InfluxDB
+  4. AlertManager
   5. Prometheus
   6. Grafana
+
+NB: Autoscaling is not enabled by default. Manual scaling of both the F5 BIG-IP VMSS and the AKS deployments is left up to the user. This example supports up to a maximum of 5 instances in the VMSS. 
 
 ## Getting Started
 
@@ -34,7 +36,19 @@ This repo contains all the required manifests and documentation to build a moder
 
 ## Installation
 
-Outline the requirements and steps to install this project.
+  1. Create a Resource Group (RG) in the Azure region of your choice. Make note of the name and the region you chose.
+  2. Create a new Virtual Network (VNET) in the RG created in step 1: 10.112.0.0/12
+  3. Create three new Network Security Groups in the RG created in step 1: 
+    i.   mgmtNsg: 10.127.254.0/24
+    ii.  extNsg: 10.127.252.0/24
+    iii. intNsg: 10.127.253.0/24
+
+  4. Create a three new Subnets in the VNET created in step 2:
+    i.   mgmt-subnet: 10.127.254.0/24
+    ii.  external-subnet: 10.127.252.0/24
+    iii. internal-subnet: 10.127.253.0/24
+
+  5. Create 
 
 ## Usage
 
