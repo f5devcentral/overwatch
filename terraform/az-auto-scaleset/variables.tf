@@ -226,3 +226,11 @@ variable "f5_license_keys" {
       "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"
     ]
 }
+variable "WEBTOP_URL" {
+  description = "URL to download APM Webtop Artifact"
+  default = ""
+}
+variable "WEBSSH_URL" {
+  description = "URL to download WebSSH2 ILX Plugin"
+  default = ""
+}

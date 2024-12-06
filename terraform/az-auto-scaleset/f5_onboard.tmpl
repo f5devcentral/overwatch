@@ -15,7 +15,6 @@ exec 1>&-
 exec 1>$npipe
 exec 2>&1
 
-
 ### write_files:
 # Download or Render BIG-IP Runtime Init Config
 
@@ -97,6 +96,9 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: TIMEZONE
     type: static
     value: ${timezone}
+  - name: REG_KEY
+    type: static
+    value: ${reg_key}
   - name: HOST_NAME
     type: metadata
     metadataProvider:
@@ -152,7 +154,7 @@ extension_services:
           myLicense:
             class: License
             licenseType: regKey
-            regKey: 'BZXSX-LYPHZ-TEKLZ-AVHSP-HEDCCDW'
+            regKey: '{{{ REG_KEY }}}'
           mySystem:
             autoPhonehome: true
             class: System
@@ -194,6 +196,10 @@ extension_services:
           myProvisioning:
             class: Provision
             ltm: nominal
+            asm: nominal
+            apm: nominal
+            ilx: nominal
+            avr: nominal
           external:
             class: VLAN
             tag: 4094
@@ -259,8 +265,24 @@ post_onboard_enabled:
   - name: misc
     type: inline
     commands:
+    - tmsh modify analytics global-settings { external-logging-publisher /Common/telemetry_publisher offbox-protocol hsl use-offbox enabled  }
+    - tmsh create ltm profile analytics telemetry-http-analytics { collect-geo enabled collect-http-timing-metrics enabled collect-ip enabled collect-max-tps-and-throughput enabled collect-methods enabled collect-page-load-time enabled collect-response-codes enabled collect-subnets enabled collect-url enabled collect-user-agent enabled collect-user-sessions enabled publish-irule-statistics enabled }
+    - tmsh create ltm profile tcp-analytics telemetry-tcp-analytics { collect-city enabled collect-continent enabled collect-country enabled collect-nexthop enabled collect-post-code enabled collect-region enabled collect-remote-host-ip enabled collect-remote-host-subnet enabled collected-by-server-side enabled }
     - tmsh save sys config
 EOF
+
+# Download Prebuilt APM Webtop
+WEBTOP_URL=
+for i in {1..30}; do
+    curl -fv --retry 1 --connect-timeout 5 -L ${WEBTOP_URL} -o "/var/config/rest/downloads/webtop.tgz" && break || sleep 10
+done
+
+
+# Download WebSSH ILX Plugin
+WEBSSH_URL="https://github.com/steveh565/f5tools/raw/master/BIG-IP-ILX-WebSSH2-0.2.8.tgz"
+for i in {1..30}; do
+    curl -fv --retry 1 --connect-timeout 5 -L ${WEBSSH_URL} -o "/var/config/rest/downloads/webssh.tgz" && break || sleep 10
+done
 
 # Download BIG-IP Runtime Init
 for i in {1..30}; do

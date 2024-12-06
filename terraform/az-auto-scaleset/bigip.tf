@@ -16,6 +16,9 @@ locals {
     AS3_URL                    = var.AS3_URL
     TS_URL                     = var.TS_URL
     FAST_URL                   = var.FAST_URL
+    REG_KEY                    = var.f5_license_keys[data.azurerm_linux_virtual_machine_scale_set.f5vmss.instance]
+    WEBTOP_URL                 = var.WEBTOP_URL
+    WEBSSH_URL                 = var.WEBSSH_URL
     DO_VER                     = split("/", var.DO_URL)[7]
     AS3_VER                    = split("/", var.AS3_URL)[7]
     TS_VER                     = split("/", var.TS_URL)[7]
