@@ -39,14 +39,14 @@ NB: Autoscaling is not enabled by default. Manual scaling of both the F5 BIG-IP 
   1. Create a Resource Group (RG) in the Azure region of your choice. Make note of the name and the region you chose.
   2. Create a new Virtual Network (VNET) in the RG created in step 1: 10.112.0.0/12
   3. Create three new Network Security Groups in the RG created in step 1: 
-    i.   mgmtNsg: 10.127.254.0/24
-    ii.  extNsg: 10.127.252.0/24
-    iii. intNsg: 10.127.253.0/24
+    - mgmtNsg: 10.127.254.0/24
+    - extNsg: 10.127.252.0/24
+    - intNsg: 10.127.253.0/24
 
   4. Create a three new Subnets in the VNET created in step 2:
-    i.   mgmt-subnet: 10.127.254.0/24
-    ii.  external-subnet: 10.127.252.0/24
-    iii. internal-subnet: 10.127.253.0/24
+    - mgmt-subnet: 10.127.254.0/24
+    - external-subnet: 10.127.252.0/24
+    - internal-subnet: 10.127.253.0/24
 
   5. Create 
 

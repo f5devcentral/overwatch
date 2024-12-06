@@ -132,6 +132,9 @@ extension_packages:
     - extensionType: as3
       extensionVersion: ${AS3_VER}
       extensionUrl: ${AS3_URL}
+    - extensionType: ts
+      extensionVersion: ${TS_VER}
+      externsionUrl: ${TS_URL}
 extension_services:
   service_operations:
     - extensionType: do
@@ -239,28 +242,294 @@ extension_services:
         persist: true
         declaration:
           class: ADC
-          schemaVersion: 3.0.0
-          label: Sample 1
-          remark: A HTTP sample application
-          Tenant_1:
-            class: Tenant
-            A1:
-              class: Application
-              template: http
-              serviceMain:
-                class: Service_HTTP
-                virtualAddresses:
-                  - '0.0.0.0/0'
-                pool: web_pool
-              web_pool:
-                class: Pool
-                monitors:
-                  - tcp
-                members:
-                  - servicePort: 80
-                    addressDiscovery: fqdn
-                    autoPopulate: true
-                    hostname: httpbin.org
+          schemaVersion: 3.16.0
+          remark: Configure BIG-IP Common/Shared objects
+          Common:
+              Shared:
+                  class: Application
+                  template: shared
+                  maintenance_rule:
+                      remark: Default Maintenance iRule
+                      class: iRule
+                      iRule: |-
+                          when HTTP_REQUEST {
+                              HTTP::respond 200 content "<html><head><title>Maintenance</title></head><body><strong>This site is in maintenance now.</strong></body></html>"
+                          }
+                  wildcardAddress:
+                      class: Service_Address
+                      virtualAddress: 0.0.0.0
+                  lb_healthProbe_rule:
+                      remark: Respond to LB healthProbe
+                      class: iRule
+                      iRule: |-
+                          when CLIENT_ACCEPTED {
+                            TCP::close
+                          }
+                  lb_healthProbe_vs:
+                      class: Service_TCP
+                      remark: LB Health Probe VS
+                      virtualPort: 666
+                      virtualAddresses:
+                          -
+                              use: wildcardAddress
+                      iRules:
+                          - lb_healthProbe_rule
+                  telemetry_local_rule:
+                      remark: Only required when TS is a local listener
+                      class: iRule
+                      iRule: |-
+                          when CLIENT_ACCEPTED {
+                            node 127.0.0.1 6514
+                          }
+                  telemetry_local:
+                      remark: Only required when TS is a local listener
+                      class: Service_TCP
+                      virtualAddresses:
+                          - 255.255.255.254
+                      virtualPort: 6514
+                      iRules:
+                          - telemetry_local_rule
+                  telemetry:
+                      class: Pool
+                      members:
+                          -
+                              enable: true
+                              serverAddresses:
+                                  - 255.255.255.254
+                              servicePort: 6514
+                      monitors:
+                          -
+                              bigip: /Common/tcp
+                  telemetry_hsl:
+                      class: Log_Destination
+                      type: remote-high-speed-log
+                      protocol: tcp
+                      pool:
+                          use: telemetry
+                  telemetry_formatted:
+                      class: Log_Destination
+                      type: splunk
+                      forwardTo:
+                          use: telemetry_hsl
+                  telemetry_publisher:
+                      class: Log_Publisher
+                      destinations:
+                          -
+                              use: telemetry_formatted
+                  telemetry_traffic_log_profile:
+                      class: Traffic_Log_Profile
+                      responseSettings:
+                          responseEnabled: true
+                          responseProtocol: mds-tcp
+                          responsePool:
+                              use: telemetry
+                          requestTemplate: >-
+                              event_source="request_logging",hostname="$BIGIP_HOSTNAME",client_ip="$CLIENT_IP",server_ip="$SERVER_IP",http_method="$HTTP_METHOD",http_uri="$HTTP_URI",virtual_name="$VIRTUAL_NAME",event_timestamp="$DATE_HTTP"
+                          responseTemplate: >-
+                              event_source="response_logging",hostname="$BIGIP_HOSTNAME",client_ip="$CLIENT_IP",server_ip="$SERVER_IP",http_method="$HTTP_METHOD",http_uri="$HTTP_URI",response_msec="$RESPONSE_MSEC",response_size="RESPONSE_SIZE",virtual_name="$VIRTUAL_NAME",event_timestamp="$DATE_HTTP"
+                  telemetry_security_log_profile:
+                      class: Security_Log_Profile
+                      application:
+                          localStorage: false
+                          remoteStorage: splunk
+                          protocol: tcp
+                          servers:
+                              -
+                                  address: 255.255.255.254
+                                  port: '6514'
+                          storageFilter:
+                              requestType: illegal-including-staged-signatures
+                  hsl_security_log_profile:
+                      class: Security_Log_Profile
+                      application:
+                          localStorage: false
+                          remoteStorage: splunk
+                          protocol: tcp
+                          servers:
+                              -
+                                  address: ${syslogRemoteAddr}
+                                  port: '7514'
+                          storageFilter:
+                              requestType: all
+          INET:
+              class: Tenant
+              IpFwding:
+                  class: Application
+                  template: generic
+                  IpFwdingSvc:
+                      class: Service_Forwarding
+                      remark: IP Forwarding Virtual Server
+                      virtualAddresses:
+                          -
+                              use: /Common/Shared/wildcardAddress
+                      virtualPort: 0
+                      forwardingType: ip
+                      layer4: tcp
+                      profileL4: basic
+                      allowVlans:
+                          -
+                              bigip: /Common/internal
+          SRA:
+              class: Tenant
+              Webtop:
+                  class: Application
+                  template: https
+                  serviceMain:
+                      class: Service_HTTPS
+                      redirect80: false
+                      virtualAddresses:
+                          -
+                              use: /Common/Shared/wildcardAddress
+                      virtualPort: 10443
+                      snat: none
+                      profileTCP:
+                          bigip: /Common/f5-tcp-progressive
+                      profileHTTP:
+                          use: webtop_http
+                      clientTLS:
+                          bigip: /Common/serverssl-insecure-compatible
+                      serverTLS: webtop_clientssl
+                      policyWAF:
+                          use: Ingress_WAF_Policy
+                      profileTrafficLog:
+                          use: /Common/Shared/telemetry_traffic_log_profile
+                      securityLogProfiles:
+                          -
+                              bigip: /Common/Log all requests
+                          -
+                              use: /Common/Shared/telemetry_security_log_profile
+                      allowVlans:
+                          -
+                              bigip: /Common/external
+                  webtop_http:
+                      class: HTTP_Profile
+                      hstsInsert: true
+                      hstsPreload: true
+                  Ingress_WAF_Policy:
+                      class: WAF_Policy
+                      url: >-
+                          https://raw.githubusercontent.com/f5devcentral/overwatch/f5BigIp/ingress-web.xml
+                      ignoreChanges: true
+                  webtop_clientssl:
+                      certificates:
+                          -
+                              certificate: Wildcard_certificate
+                      ciphers: DEFAULT
+                      requireSNI: false
+                      class: TLS_Server
+                  Wildcard_certificate:
+                      class: Certificate
+                      remark: in practice we recommend using a passphrase
+                      certificate: |-
+                          -----BEGIN CERTIFICATE-----
+                          MIIDtTCCAp2gAwIBAgIBAzANBgkqhkiG9w0BAQsFADBGMQswCQYDVQQGEwJVUzET
+                          MBEGA1UECAwKQ2FsaWZvcm5pYTESMBAGA1UECgwJTXlDb21wYW55MQ4wDAYDVQQD
+                          DAVsYWJDQTAeFw0xOTA0MjUyMzM3NDVaFw0yOTA0MjIyMzM3NDVaMF8xCzAJBgNV
+                          BAYTAkNBMRAwDgYDVQQIEwdPbnRhcmlvMRQwEgYDVQQKEwtGNSBOZXR3b3JrczEO
+                          MAwGA1UECxMFU2FsZXMxGDAWBgNVBAMTD3dlYnRvcC5mNXNlLmNvbTCCASIwDQYJ
+                          KoZIhvcNAQEBBQADggEPADCCAQoCggEBAO6mWzsOY0UuRzSiVU65gmlSit4d7tW4
+                          E/kWYY3LT/dxG2V/kzHhO70amNCTDVv5oAKkToLYCdJNWWxEI+EgUigDtg/v4E1R
+                          H0KEQdGC6RHnYK8kOmWWm9Pminh1P1o03QiJ41zj5KcyFYJq4pFRctN5iPs0+F/Y
+                          5JBDbPcnuk3OuRLxI67tPwqAQQurXcvGzCYF1y1zxlHxxWyUbuTdCo3GeO2Vo3bN
+                          MSTSj9hmxc8QEXif1qA/KDnLtY+IemptJT5aC0WZRwp2lncKOpSLcMcdQAprxHYA
+                          6LLkztNqVwCXQFjA7zfVRXV63JGhjV+oR4O8yemLffUVydihXzcsruMCAwEAAaOB
+                          lDCBkTAJBgNVHRMEAjAAMB0GA1UdDgQWBBRjzhMuUopHVdDvj9xvCskIPacvQzAf
+                          BgNVHSMEGDAWgBQMgRSSF2oS8RCZJADBj3YSv90EsTAOBgNVHQ8BAf8EBAMCBeAw
+                          NAYDVR0lAQH/BCowKAYIKwYBBQUHAwIGCCsGAQUFBwMBBggrBgEFBQcDAwYIKwYB
+                          BQUHAwQwDQYJKoZIhvcNAQELBQADggEBAKxtUE9tImn6MF0E2RNYeaTkIyCozjPw
+                          ARofuW4eE5VKoZyq8JCbzUG44yT8gCSAj24LYuM7mk9CceHpu4pSyLHuptP1W8ZT
+                          zpy4BPHaeFoJZCgBW8KkOdlW/4WRTmbfG3YaxPClOj7f5P4Tkw2XaftPJqQWZnCx
+                          pEBU8e5AVOSmV1/vkhEi5FjV1aCXEm2DH9TJQtxABKGCaNtwnS701mmJH0HWlDSm
+                          MyBI/jTOO2XMoWGEzL9pIMiPPGZZbGWUIfvfhsgBFnJoSUa9ijteR5CLhX7DIfAl
+                          juMTHgWmsN80SOIEUaLYNfeFQxkgL0uVc8nzc3JGN+78h+Ktg4piRCM=
+                          -----END CERTIFICATE-----
+                      privateKey: |-
+                          -----BEGIN PRIVATE KEY-----
+                          MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDupls7DmNFLkc0
+                          olVOuYJpUoreHe7VuBP5FmGNy0/3cRtlf5Mx4Tu9GpjQkw1b+aACpE6C2AnSTVls
+                          RCPhIFIoA7YP7+BNUR9ChEHRgukR52CvJDpllpvT5op4dT9aNN0IieNc4+SnMhWC
+                          auKRUXLTeYj7NPhf2OSQQ2z3J7pNzrkS8SOu7T8KgEELq13LxswmBdctc8ZR8cVs
+                          lG7k3QqNxnjtlaN2zTEk0o/YZsXPEBF4n9agPyg5y7WPiHpqbSU+WgtFmUcKdpZ3
+                          CjqUi3DHHUAKa8R2AOiy5M7TalcAl0BYwO831UV1etyRoY1fqEeDvMnpi331FcnY
+                          oV83LK7jAgMBAAECggEAE06WFuMFGPWzgQiZCjNr34V0AqA9UEECLKao4cXPBF+8
+                          LavyhpiIMrZSIp2i+Qvq7AvK5j8AHGlxkJa6qF3rB521PvjTFq43bzQv9vk2TeKA
+                          KesuZkWW+b+u+CvUIkIgl65AHKW7O+OLZe+rwMHsHju430nbxjVP2HP7/srSAbVN
+                          t3yyXPmI4VSB2P8NzkYCzr/B46LcS/2OBno9iwjQwDspQNJhpUmxPsFfG0OS0WWh
+                          qLgpUvG8GEPkCv8fRjjrqh9iJ3kZOpmv5nQ1OE0ypwYoPhJDiJAAZiXRtPImoM06
+                          2M6CbvtdunRuVvVNBYgu75jRgunZycQJP48tWWcWsQKBgQD7/X1WKBIqJRZcDYTf
+                          8pHFDzZxhDOpYX31vddk7A3xv9XvqQVCu6hkbFvMu5b80AOeYlo2SCvaA97sS7Bp
+                          bafoT6ZCwBztEBjk9v+X0LOSg847c/ik3+M9Nsnpv9N0qdjGtPgm8Kb15PaiHYAH
+                          T6kLkvYCFS5G17B2sVoOoWg7fQKBgQDycoX2+FPMPFqUesZ3BlAcZM8sVFTg1VL6
+                          RGesJLrT/3ueOUiCWjjcJlPodBNg2Y8N3hQV0CdwGxR14nKoVw0vpv+r/iJp1F7s
+                          sGqjtMIw6fHdqPdX2GIvraIxU+j8p94R1ACii3aztqcluJ1S8CsNmUxgUoMJKtO/
+                          tvNB4Pjh3wKBgELz/kpXCUSDaCZ7PRPXup12RkvxCVz212Xk1AcvpSDXjLtJ2Gj7
+                          vWk5VUbXjO2NQ3jgvwFvOZ+Kqb90+OF6TkOubgmMS+M9BLBJZG3s+Nl0BebMEIOW
+                          LSWFmi5uVnvH6R4a1VhbVrE87b7zQaIvq0W0/YJeKFaQVoWi57+9aRltAoGBANV/
+                          5FjH9YM04s8+Dudht8pJO+ddnCEhuiCJfIIrFhr6MHH1H9UqfkffuKRLE4WGEGO1
+                          3RoYY6JlNm9ZKn7zqbj85ske0k8/pRfpgv8Gfrt0SHlaAfZppo016k5mBhX3/abV
+                          enmpNq6reiXNnT0cIc2n4YoxHxNDk5SQF0c8Re8hAoGATtdkvUp4f6A4v9ppdJZs
+                          pz7M6/NbKGJH9F3GZseSKTBKgtndiBugrfePOrcdC+4O0i33lvWDOs70kREC4wCG
+                          XMt36aS9Z384Pl7Z7FhiVQrTF2ZuRP/6v1r3iJDHixmJYQzjBO2Zh1D7Sf39BxOv
+                          2h0dFcPMKaZcLsXTFH1qS0I=
+                          -----END PRIVATE KEY-----
+              WebSSHProxy:
+                  class: Application
+                  template: http
+                  serviceMain:
+                      class: Service_HTTP
+                      virtualPort: 10022
+                      snat: none
+                      profileTCP:
+                          bigip: /Common/f5-tcp-progressive
+                      virtualAddresses:
+                          - ${webssh_vs_addr}
+                      iRules:
+                          -
+                              bigip: /Common/WebSSH2_plugin/webssh2_node
+                      allowVlans:
+                          -
+                              bigip: /Common/external
+              - extensionType: ts
+                type: inline
+                value:
+                  class: Telemetry
+                  My_System:
+                      class: Telemetry_System
+                      systemPoller:
+                          interval: 60
+                          actions:
+                              -
+                                  setTag:
+                                      facility: ECK-Azure-AKS
+                                  locations:
+                                      system: true
+                  controls:
+                      class: Controls
+                      logLevel: info
+                  My_Poller:
+                      class: Telemetry_System_Poller
+                      interval: 0
+                  My_Listener:
+                      class: Telemetry_Listener
+                      port: 6514
+                  metrics:
+                      class: Telemetry_Pull_Consumer
+                      type: Prometheus
+                      systemPoller:
+                          - My_Poller
+                  My_Consumer:
+                      class: Telemetry_Consumer
+                      type: Generic_HTTP
+                      host: ${HEC_Addr}
+                      protocol: http
+                      port: 7080
+                      path: /
+                      method: POST
+                      headers:
+                          -
+                              name: content-type
+                              value: application/json
+                      outputMode: processed
 post_onboard_enabled:
   - name: misc
     type: inline
@@ -298,6 +567,29 @@ bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
+
+#
+function installWebTop () {
+    tmsh create apm profile connectivity /SRA/webtop_cp
+    tmsh create apm profile vdi /SRA/webtop_vdi
+    tmsh create ltm profile rewrite /SRA/webtop_rwp defaults-from rewrite-portal location-specific false split-tunneling false request { insert-xforwarded-for enabled rewrite-headers enabled } response { rewrite-content enabled rewrite-headers enabled }
+    #import pre-fabricated template
+    ng_import -s /var/config/rest/downloads/webtop.tgz webtop_ap -p SRA
+    if [ "$?" -eq 0 ]; then
+        tmsh modify apm resource portal-access /SRA/webtop_ap-WebSSH_F5VM01 { application-uri "http://${webssh_vip}:10022/ssh/host/${f5vm01_mgmt_ip}?port=22&header=CLASSIFIED&headerBackground=red" }
+        tmsh modify apm resource portal-access /SRA/webtop_ap-WebSSH_F5VM02 { application-uri "http://${webssh_vip}:10022/ssh/host/${f5vm02_mgmt_ip}?port=22&header=CLASSIFIED&headerBackground=red" }
+        tmsh modify apm profile access /SRA/webtop_ap-rdp_gateway_ap generation-action increment
+        tmsh modify apm profile access /SRA/webtop_ap generation-action increment
+        tmsh modify ltm virtual /SRA/Webtop/serviceMain profiles add {/SRA/webtop_ap} profiles add {/SRA/webtop_vdi} profiles add {/SRA/webtop_cp} profiles add {/SRA/webtop_rwp}
+        tmsh modify ltm virtual /SRA/Webtop/serviceMain cmp-enabled no
+        ldbutil --add --uname="${api_user}" --password="${api_pass}" --instance="/SRA/webtop_ap-webtop_db" --user_groups="administrators" --login_failures="3" --change_passwd="false" --locked_out="false" --first_name="Azure" --last_name="Ops" --email="${api_user}@${dns_domain}"
+    else
+        echo "WARN: APM Policy import failed";
+        whoout=$(whoami)
+        idout=$(id)
+        echo "DEBUG: user=$USER, shell=$SHELL, home=$HOME, whoout=$whoout, id=$idout"
+    fi
+}
 
 # Emergency Admin Access
 echo "set creds"
