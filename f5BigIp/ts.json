@@ -36,7 +36,7 @@
     "My_Consumer": {
         "class": "Telemetry_Consumer",
         "type": "Generic_HTTP",
-        "host": "20.220.251.246",
+        "host": "52.156.22.174",
         "protocol": "http",
         "port": 7080,
         "path": "/",

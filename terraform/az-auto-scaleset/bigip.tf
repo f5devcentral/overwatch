@@ -46,7 +46,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "f5vmss" {
   location             = data.azurerm_resource_group.main.location
   resource_group_name  = data.azurerm_resource_group.main.name
   sku                  = var.instance_type
-  instances            = 2
+  instances            = var.instances
   admin_username       = var.f5_username
   admin_password       = var.f5_password
   disable_password_authentication = false

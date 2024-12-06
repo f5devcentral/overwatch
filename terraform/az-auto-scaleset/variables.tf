@@ -7,7 +7,7 @@ variable "projectPrefix" {
 }
 variable "location" {
   type        = string
-  default     = "westus2"
+  default     = "canadaeast"
   description = "Azure Location of the deployment"
 }
 variable "vnet_rg" {
@@ -77,7 +77,7 @@ variable "f5_username" {
 }
 variable "f5_password" {
   type        = string
-  default     = "Canada12345!"
+  default     = "Default123456"
   description = "BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az_key_vault_authentication = true, ex. my-bigip-secret)"
 }
 variable "az_keyvault_authentication" {
@@ -171,7 +171,7 @@ variable "bigIqUsername" {
 }
 variable "bigIqPassword" {
   type        = string
-  default     = "Canada12345!"
+  default     = "Default123456"
   description = "Admin Password for BIG-IQ"
 }
 variable "bigIqLicenseType" {
@@ -212,4 +212,17 @@ variable "resourceOwner" {
 variable "vm_name" {
   description = "Prefix for BIG-IP autoscale instance name. If empty, default is 'bigip' string + prefix + random_id"
   default     = ""
+}
+variable "instances" {
+  description = "Size of VMSS - number of instances. If empty, default is 'bigip' string + prefix + random_id"
+  default     = "2"
+}
+variable "f5_license_keys" {
+    default = [
+      "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE",
+      "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE",
+      "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE",
+      "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE",
+      "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"
+    ]
 }
