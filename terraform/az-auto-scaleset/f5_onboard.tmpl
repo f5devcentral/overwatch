@@ -583,20 +583,21 @@ function installWebSSH () {
 
 #
 function installWebTop () {
-    tmsh create apm profile connectivity /SRA/webtop_cp
-    tmsh create apm profile vdi /SRA/webtop_vdi
-    tmsh create ltm profile rewrite /SRA/webtop_rwp defaults-from rewrite-portal location-specific false split-tunneling false request { insert-xforwarded-for enabled rewrite-headers enabled } response { rewrite-content enabled rewrite-headers enabled }
+    tmsh create apm profile connectivity /WebTop/webtop_cp
+    tmsh create apm profile vdi /WebTop/webtop_vdi
+    tmsh create ltm profile rewrite /WebTop/webtop_rwp defaults-from rewrite-portal location-specific false split-tunneling false request { insert-xforwarded-for enabled rewrite-headers enabled } response { rewrite-content enabled rewrite-headers enabled }
     #import pre-fabricated template
-    ng_import -s /var/config/rest/downloads/webtop.tgz webtop_ap -p SRA
+    ng_import -s /var/config/rest/downloads/webtop.tgz webtop_ap -p WebTop
     if [ "$?" -eq 0 ]; then
-        tmsh modify apm resource portal-access /SRA/webtop_ap-WebSSH_F5VM01 { application-uri "http://${webssh_vip}:10022/ssh/host/${f5vm01_mgmt_ip}?port=22&header=PROTECTED-B&headerBackground=red" }
-        tmsh modify apm resource portal-access /SRA/webtop_ap-WebSSH_F5VM02 { application-uri "http://${webssh_vip}:10022/ssh/host/${f5vm02_mgmt_ip}?port=22&header=PROTECTED-B&headerBackground=red" }
-        tmsh modify apm resource portal-access /SRA/webtop_ap-WebSSH_TUX { application-uri "http://${webssh_vip}:10022/ssh/host/${tux_mgmt_ip}?port=22&header=PROTECTED-B&headerBackground=red" }
-        tmsh modify apm profile access /SRA/webtop_ap-rdp_gateway_ap generation-action increment
-        tmsh modify apm profile access /SRA/webtop_ap generation-action increment
-        tmsh modify ltm virtual /SRA/Webtop/serviceMain profiles add {/SRA/webtop_ap} profiles add {/SRA/webtop_vdi} profiles add {/SRA/webtop_cp} profiles add {/SRA/webtop_rwp}
-        tmsh modify ltm virtual /SRA/Webtop/serviceMain cmp-enabled no
-        ldbutil --add --uname="${api_user}" --password="${api_pass}" --instance="/SRA/webtop_ap-webtop_db" --user_groups="administrators" --login_failures="3" --change_passwd="false" --locked_out="false" --first_name="Azure" --last_name="Ops" --email="${api_user}@${dns_domain}"
+        tmsh modify apm resource portal-access /WebTop/webtop_ap-WebSSH_F5VM01 { application-uri "http://9.9.9.9:10022/ssh/host/${f5vm01_mgmt_ip}?port=22&header=PROTECTED-B&headerBackground=red" }
+        tmsh modify apm resource portal-access /WebTop/webtop_ap-WebSSH_F5VM02 { application-uri "http://9.9.9.9:10022/ssh/host/${f5vm02_mgmt_ip}?port=22&header=PROTECTED-B&headerBackground=red" }
+        tmsh modify apm resource portal-access /WebTop/webtop_ap-WebSSH_TUX { application-uri "http://9.9.9.9:10022/ssh/host/${tux_mgmt_ip}?port=22&header=PROTECTED-B&headerBackground=red" }
+        tmsh modify apm resource portal-access /WebTop/ElasticSearch { application-uri "https://${f5vm01_mgmt_ip}:5601/" }
+        tmsh modify apm resource portal-access /WebTop/webtop_ap-Grafana { application-uri "https://${f5vm01_mgmt_ip}:8443/" }
+        tmsh modify apm profile access /WebTop/webtop_ap generation-action increment
+        tmsh modify ltm virtual /WebTop/Webtop/serviceMain profiles add {/WebTop/webtop_ap} profiles add {/WebTop/webtop_vdi} profiles add {/WebTop/webtop_cp} profiles add {/WebTop/webtop_rwp}
+        tmsh modify ltm virtual /WebTop/Webtop/serviceMain cmp-enabled no
+        ldbutil --add --uname="${api_user}" --password="${api_pass}" --instance="/WebTop/webtop_ap-webtop_db" --user_groups="Administrators" --login_failures="3" --change_passwd="false" --locked_out="false" --first_name="Azure" --last_name="Ops" --email="${api_user}@${dns_domain}"
     else
         echo "WARN: APM Policy import failed";
         whoout=$(whoami)
