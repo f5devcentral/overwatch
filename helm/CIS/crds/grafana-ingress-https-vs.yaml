@@ -27,7 +27,7 @@ spec:
     serviceDownAction: reselect
     monitors:
      - interval: 5
-       recv: "200"
+       recv: "HTTP"
        send: "HEAD / HTTP/1.0\r\n\r\n"
        timeout: 15
        type: http
