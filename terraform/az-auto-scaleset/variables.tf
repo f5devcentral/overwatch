@@ -234,3 +234,7 @@ variable "WEBSSH_URL" {
   description = "URL to download WebSSH2 ILX Plugin"
   default = ""
 }
+variable "syslogRemoteAddr" {
+  default = ""
+  description = "Remote Syslog Collector IP address"
+}
