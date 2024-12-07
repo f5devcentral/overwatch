@@ -19,28 +19,6 @@ spec:
       server: /Common/f5-tcp-lan
   host: grafana.f5demo.com
   httpTraffic: redirect
-  defaultPool:
-    reference: service
-    service: grafana-labs-stack
-    serviceNamespace: default
-    loadBalancingMethod: fastest-node
-    servicePort: 80
-    serviceDownAction: reselect
-    reselectTries: 3
-    monitors:
-     - interval: 5
-       recv: a
-       send: /
-       targetPort: 80
-       timeout: 15
-       type: tcp
-     - interval: 5
-       recv: a
-       send: /
-       timeout: 15
-       type: http
-     - name: /Common/http
-       reference: bigip
   pools:
   - path: /
     service: grafana-labs-stack
@@ -49,18 +27,10 @@ spec:
     serviceDownAction: reselect
     monitors:
      - interval: 5
-       recv: a
-       send: /
-       targetPort: 80
-       timeout: 15
-       type: tcp
-     - interval: 5
-       recv: a
-       send: /
+       recv: "200"
+       send: "HEAD / HTTP/1.0\r\n\r\n"
        timeout: 15
        type: http
-     - name: /Common/http
-       reference: bigip
   tlsProfileName: graf-terminate-tls13
 ---
 apiVersion: cis.f5.com/v1
