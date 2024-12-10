@@ -6,7 +6,7 @@ metadata:
   name: logstash-ingress-syslog-tcp-vs
   namespace: elastic-system
 spec:
-  virtualServerAddress: 10.127.252.11
+  virtualServerAddress: 0.0.0.0
   virtualServerPort: 7514
   virtualServerName: logstash-ingress-syslog-tcp-vs
   mode: performance

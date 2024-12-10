@@ -6,7 +6,7 @@ metadata:
   labels:
     f5cr: "true"
 spec:
-  virtualServerAddress: 10.127.252.11
+  virtualServerAddress: 0.0.0.0
   virtualServerHTTPPort: 8080
   virtualServerHTTPSPort: 8443
   virtualServerName: grafana-ingress-https-vs
@@ -50,3 +50,4 @@ spec:
     reference: bigip
   hosts:
   - grafana.f5demo.com
+  - grafana.canadacentral.cloudapp.azure.com

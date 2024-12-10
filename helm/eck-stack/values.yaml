@@ -20,7 +20,8 @@ eck-elasticsearch:
       # and leave node.store.allow_mmap unset.
       # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
       #
-      #node.store.allow_mmap: false    
+      #node.store.allow_mmap: false
+      search.max_async_search_response size 20965760
     podTemplate:
       spec:
         #This init container ensures that max_map_count setting is applied before starting Elasticsearch
@@ -36,6 +37,9 @@ eck-elasticsearch:
             requests:
               memory: 8Gi
               cpu: 8
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms4096m -Xmx8192m
     service:
       type: ClusterIP
 eck-kibana:
@@ -53,11 +57,11 @@ eck-kibana:
               value: "--max-old-space-size=2048"
           resources:
             requests:
-              memory: 1Gi
-              cpu: 0.5
-            limits:
-              memory: 2.5Gi
+              memory: 2Gi
               cpu: 2
+            limits:
+              memory: 5Gi
+              cpu: 4
     http:
       service:
         spec:
@@ -146,7 +150,7 @@ eck-logstash:
             cpu: 4
         env:
         - name: LS_JAVA_OPTS
-          value: -Xms2000m -Xmx2000m
+          value: -Xms4096m -Xmx8192m
   pipelines:
     - pipeline.id: http
       config.string: |

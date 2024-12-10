@@ -6,7 +6,7 @@ metadata:
   labels:
     f5cr: "true"
 spec:
-  virtualServerAddress: 10.127.252.11
+  virtualServerAddress: 0.0.0.0
   virtualServerHTTPPort: 5600
   virtualServerHTTPSPort: 5601
   virtualServerName: kibana-ingress-https-vs
@@ -51,3 +51,4 @@ spec:
     reference: bigip
   hosts:
   - kibana.f5demo.com
+  - kibana.canadacentral.cloudapp.azure.com

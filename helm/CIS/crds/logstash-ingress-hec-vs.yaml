@@ -6,7 +6,7 @@ metadata:
   labels:
     f5cr: "true"
 spec:
-  virtualServerAddress: 10.127.252.11
+  virtualServerAddress: 0.0.0.0
   virtualServerHTTPPort: 7080
   virtualServerHTTPSPort: 7443
   virtualServerName: logstash-ingress-hec-vs
@@ -49,3 +49,4 @@ spec:
     reference: bigip
   hosts:
   - logstash-hec.f5demo.com
+  - logstash-hec.canadacentral.cloudapp.azure.com

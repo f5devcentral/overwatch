@@ -6,7 +6,7 @@ metadata:
   name: logstash-ingress-beats-vs
   namespace: elastic-system
 spec:
-  virtualServerAddress: 10.127.252.11
+  virtualServerAddress: 0.0.0.0
   virtualServerPort: 5044
   virtualServerName: logstash-ingress-beats-vs
   mode: performance

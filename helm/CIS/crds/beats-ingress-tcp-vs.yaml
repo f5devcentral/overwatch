@@ -6,7 +6,7 @@ metadata:
   name: logstash-ingress-beats-vs
   namespace: elastic-system
 spec:
-  virtualServerAddress: "10.127.252.11"
+  virtualServerAddress: "0.0.0.0"
   virtualServerPort: 7514
   virtualServerName: logstash-ingress-beats-vs
   mode: performance
@@ -28,7 +28,7 @@ spec:
       timeout: 10
     # reselectTries specifies the maximum number of attempts to find a responsive member for a connection
     # Supported values: [0, 65535]
-    reselectTries: 15
+    reselectTries: 3
     # serviceDownAction specifies connection handling when member is non-responsive
     # Supported values: “drop”, “none”, “reselect”, “reset”
     serviceDownAction: reselect
