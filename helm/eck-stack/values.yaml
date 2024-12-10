@@ -158,7 +158,6 @@ eck-logstash:
         input {
           http {
             id => "http"
-            host => "0.0.0.0"
             port => "7080"
             type => hec
             ssl_enabled => false
@@ -179,32 +178,126 @@ eck-logstash:
         # TCP and UDP Syslog inputs
         input {
           tcp {
+            port => 6514
+            type => f5BigIpAWAF
+            codec => plain { charset=> "ISO-8859-1" }
+          }          
+          tcp {
             port => 7514
             type => syslog
-            codec => plain { charset=>"ASCII" }
+            codec => plain { charset=> "ASCII" }
           }
           udp {
             port => 7514
             type => syslog
-            codec => plain { charset=>"ASCII" }
+            codec => plain { charset=> "ASCII" }
           }
         }
         filter {
           if [type] == "syslog" {
             grok {
               match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+              break_on_match => false
               add_field => [ "received_at", "%{@timestamp}" ]
               add_field => [ "received_from", "%{host}" ]
             }
-            date {
-              match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+            mutate {
+              replace => { "[@metadata][index_prefix]" => "syslog" }
+            }
+          }
+          if [type] == "f5BigIpAWAF" {
+              grok {
+                match => {
+                  "message" => [
+                  ",attack_type=\"%{DATA:attack_type}\"",
+                  ",blocking_exception_reason=\"%{DATA:blocking_exception_reason}\"",
+                  ",bot_anomalies=\"%{DATA:bot_anomalies}\"",
+                  ",bot_category=\"%{DATA:bot_category}\"",
+                  ",bot_signature_name=\"%{DATA:bot_signature_name}\"",
+                  ",client_application=\"%{DATA:client_application}\"",
+                  ",client_application_version=\"%{DATA:client_application_version}\"",
+                  ",client_class=\"%{DATA:client_class}\"",
+                  ",date_time=\"%{DATA:date_time}\"",
+                  ",dest_port=\"%{DATA:dest_port}\"",
+                  ",enforced_bot_anomalies=\"%{DATA:enforced_bot_anomalies}\"",
+                  ",grpc_method=\"%{DATA:grpc_method}\"",
+                  ",grpc_service=\"%{DATA:grpc_service}\"",
+                  ",ip_client=\"%{DATA:ip_client}\"",
+                  ",is_truncated=\"%{DATA:is_truncated}\"",
+                  ",method=\"%{DATA:method}\"",
+                  ",outcome=\"%{DATA:outcome}\"",
+                  ",outcome_reason=\"%{DATA:outcome_reason}\"",
+                  ",policy_name=\"%{DATA:policy_name}\"",
+                  ",protocol=\"%{DATA:protocol}\"",
+                  ",request_status=\"%{DATA:request_status}\"",
+                  ",request=\"%{DATA:request}\"",
+                  ",request_body_base64=\"%{DATA:request_body_base64}\"",
+                  ",response_code=\"%{DATA:response_code}\"",
+                  ",severity=\"%{DATA:severity}\"",
+                  ",sig_cves=\"%{DATA:sig_cves}\"",
+                  ",sig_ids=\"%{DATA:sig_ids}\"",
+                  ",sig_names=\"%{DATA:sig_names}\"",
+                  ",sig_set_names=\"%{DATA:sig_set_names}\"",
+                  ",src_port=\"%{DATA:src_port}\"",
+                  ",staged_sig_cves=\"%{DATA:staged_sig_cves}\"",
+                  ",staged_sig_ids=\"%{DATA:staged_sig_ids}\"",
+                  ",staged_sig_names=\"%{DATA:staged_sig_names}\"",
+                  ",staged_threat_campaign_names=\"%{DATA:staged_threat_campaign_names}\"",
+                  ",sub_violations=\"%{DATA:sub_violations}\"",
+                  ",support_id=\"%{DATA:support_id}\"",
+                  ",threat_campaign_names=\"%{DATA:threat_campaign_names}\"",
+                  ",unit_hostname=\"%{DATA:unit_hostname}\"",
+                  ",uri=\"%{DATA:uri}\"",
+                  ",violations=\"%{DATA:violations}\"",
+                  ",violation_details=\"%{DATA:violation_details_xml}\"",
+                  ",violation_rating=\"%{DATA:violation_rating}\"",
+                  ",vs_name=\"%{DATA:vs_name}\"",
+                  ",x_forwarded_for_header_value=\"%{DATA:x_forwarded_for_header_value}\""
+                ]
+              }
+              break_on_match => false
+            }
+            if [violation_details_xml] != "N/A" {
+              xml {
+                source => "violation_details_xml"
+                target => "violation_details"
+              }
+            }
+            mutate {
+              split => { "attack_type" => "," }
+              split => { "sig_cves" => "," }
+              split => { "sig_ids" => "," }
+              split => { "sig_names" => "," }
+              split => { "sig_set_names" => "," }
+              split => { "staged_sig_cves" => "," }
+              split => { "staged_sig_ids" => "," }
+              split => { "staged_sig_names" => "," }
+              split => { "staged_threat_campaign_names" => "," }
+              split => { "sub_violations" => "," }
+              split => { "threat_campaign_names" => "," }
+              split => { "violations" => "," }
+              replace => { "[@metadata][index_prefix]" => "syslog" }
+              remove_field => [
+                "[violation_details][violation_masks]",
+                "violation_details_xml",
+                "message"
+              ]
+            }
+              if [x_forwarded_for_header_value] != "N/A" {
+                mutate { add_field => { "source_host" => "%{x_forwarded_for_header_value}"}}
+              } else {
+                mutate { add_field => { "source_host" => "%{ip_client}"}}
+              }
+              geoip {
+                source => "source_host"
+              }
             }
           }
         }
         output {
           stdout { codec => plain }
           elasticsearch {
-            index => "logstash-syslog-%{+YYYY.MM.dd}"
+            index => "logstash-%{[@metadata][index_prefix]}-%{+YYYY.MM.dd}"
             hosts => [ "${ECK_ES_HOSTS}" ]
             user => "${ECK_ES_USER}"
             password => "${ECK_ES_PASSWORD}"
@@ -212,7 +305,7 @@ eck-logstash:
             #ssl_certificate_authorities => "${ECK_ES_SSL_CERTIFICATE_AUTHORITY}"
           }
         }
-    - pipeline.id: main
+    - pipeline.id: beats
       config.string: |
         #filebeat input
         input {
