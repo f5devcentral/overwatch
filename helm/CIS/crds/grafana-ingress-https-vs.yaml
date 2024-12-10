@@ -6,7 +6,7 @@ metadata:
   labels:
     f5cr: "true"
 spec:
-  virtualServerAddress: 0.0.0.0
+  virtualServerAddress: 10.127.252.11
   virtualServerHTTPPort: 8080
   virtualServerHTTPSPort: 8443
   virtualServerName: grafana-ingress-https-vs

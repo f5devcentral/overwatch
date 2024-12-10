@@ -21,7 +21,7 @@ eck-elasticsearch:
       # ref: https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
       #
       #node.store.allow_mmap: false
-      search.max_async_search_response size 20965760
+      #search.max_async_search_response size 20965760
     podTemplate:
       spec:
         #This init container ensures that max_map_count setting is applied before starting Elasticsearch
@@ -40,8 +40,8 @@ eck-elasticsearch:
           env:
           - name: ES_JAVA_OPTS
             value: -Xms4096m -Xmx8192m
-    service:
-      type: ClusterIP
+      service:
+        type: ClusterIP
 eck-kibana:
   enabled: true
   spec:
@@ -178,11 +178,11 @@ eck-logstash:
         # TCP and UDP Syslog inputs
         input {
           tcp {
-            port => 6514
+            port => 8514
             type => f5BigIpAWAF
             codec => plain { charset=> "ISO-8859-1" }
           }          
-          tcp {
+          syslog {
             port => 7514
             type => syslog
             codec => plain { charset=> "ASCII" }
@@ -283,15 +283,6 @@ eck-logstash:
                 "message"
               ]
             }
-              if [x_forwarded_for_header_value] != "N/A" {
-                mutate { add_field => { "source_host" => "%{x_forwarded_for_header_value}"}}
-              } else {
-                mutate { add_field => { "source_host" => "%{ip_client}"}}
-              }
-              geoip {
-                source => "source_host"
-              }
-            }
           }
         }
         output {
@@ -341,6 +332,15 @@ eck-logstash:
               name: "filebeat"
               protocol: TCP
               targetPort: 5044
+    - name: syslog-f5-tcp
+      service:
+        spec:
+          type: ClusterIP
+          ports:
+            - port: 8514
+              name: "syslog-f5-tcp"
+              protocol: TCP
+              targetPort: 8514
     - name: syslog-tcp
       service:
         spec:

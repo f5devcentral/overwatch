@@ -51,7 +51,7 @@ prometheus:
     storageClass: managed-csi
     pvcDeleteOnStsDelete: false
     pvcDeleteOnStsScale: false
-    existingClaim: prometheus-data
+    #existingClaim: prometheus-data
   prometheusSpec:
     additionalScrapeConfigs:
       - job_name: 'integrations/f5-bigip'  # Name of the scrape job
