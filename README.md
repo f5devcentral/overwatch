@@ -79,19 +79,86 @@ Part II: Bastion Host
       - Action: Allow
       - Click: Add
     
-Part III: SSH to the Bastion Host to prepare your build envionment
+Part III: SSH to the Bastion Host and prepare your build envionment
   9. If using windows, install Windows Terminal along with OpenSSH client (available on the Windows Store) on your local workstation.
   10. Launch a Terminal session, and SSH to the Public IP address of the Bastion Host using the credentials settings supplied in Step 7.
-  11. Execute the commands as show in the repo artifact located here: https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/build_ubuntu_vms.sh
-    - Install all OS updates and security patches
-    - Install Terraform
-    - Install kubectl
-    - Install k9s
-    - Install Azure CLI
-  5. Using your CLI of choice, in the manifests/elk folder, run: 
-                            kubectl apply -f ./*.yaml
-  6. Using your CLI of choice, in the manifests folder, run: 
-                            kubectl apply -f ./*.yaml
+  11. Update the BaseOS and install our DevOps tools:
+    - Copy and Paste the commands as show in the repo artifact: https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/build_ubuntu_vms.sh
+    - These commands will perform the following essential tasks:
+      - Install all OS updates and security patches
+      - Install cli tools: curl, wget, net-tools, python3-pip, ansible, gnupg, git, jq
+      - Install devops tools: 
+        - Terraform
+        - kubectl
+        - k9s
+        - Azure CLI
+        - Filebeat agent
+    - You will most likely want to reboot the Bastion Host Virtual Machine for any kernel updates to take effect.
+  12. Clone this Repo to your Bastion Host:
+    - 'mkdir -p ~/code && cd ~/code && git clone https://github.com/f5devcentral/overwatch.git'
+  13. Customize the default values for the F5 BigIP VMSS configuration:
+    - cd ~/code/overwatch/terraform/az-auto-scaleset
+    - cp terraform.tfvars.example terraform.tfvars
+    - vi/nano terraform.tfvars
+      - ***CRITICAL*** Set Custom Username and Password and SSH Public Key location values at a minimum
+      - customize other values to match your Azure environment
+  14. Customize the default values for the aks-cluster deployment:
+    - cd ~/code/overwatch/terraform/az-aks-cluster
+    - cp terraform.tfvars.example terraform.tfvars
+    - vi/nano terraform.tfvars
+      - ***CRITICAL*** Set Custom Username and Password values at a minimum
+  15. Configure CIS with the same credentials configured in Step 13.
+    - cd ~/code/overwatch/helm/cis
+    - vi cis.sh
+      - set the user and pass values to match those used when you deployed the F5 BigIP VMSS in Step 15
+
+Part IV: Deploy the infrastructure
+  16. Deploy the F5 BigIP VMSS:
+    - cd ~/code/overwatch/terraform/az-auto-scaleset
+    - terraform init
+    - terraform plan
+    - terraform apply --auto-approve
+    - Make note of the final outputs with information such as Public IPs for remotely managing the f5 BigIP instances
+  17. Deploy the AKS Cluster:
+    - cd ~/code/overwatch/terraform/az-aks-cluster
+    - terraform init
+    - terraform plan
+    - terraform apply --auto-approve
+    - Make note of the final outputs with information such as Public IPs for remotely managing the aks cluster node instances
+  18. Deploy F5 Container Ingress Services operator:
+    - cd ~/code/overwatch/helm/cis
+    - ./cis.sh
+  19. Configure kubectl and helm to remotely administer AKS cluster:
+    - cd ~/code/overwatch
+    - vi/nano kubeconfig.sh
+    - Set 'rg' value to match the name of the Resource Group created in Step 2.
+    - Set 'aks' value to match the name of the AKS cluster created in step 17.
+    - ./kubeconfig.sh 
+      - NB: You will be prompted to autenticate to the Azure Portal to fetch the credentials needed to remotely mange the AKS cluster
+      - NB: You may be prompted to accept the Terms and Conditions of the F5 BigIP Azure Marketplace image. This is normal and doesn't have a cost associated with it since we're using a BYOL image type
+    - alias k=kubectl
+    - source <(kubectl completion bash)
+    - k get pods -A #you should not see any errors
+
+Part V: Deploy the modern observability software stack
+  20. Deploy ELK Stack:
+    - cd ~/code/overwatch/helm/eck-stack
+    - vi values.yaml (adjust as needed or leave defaults if not sure)
+    - ./eck.sh
+    - NB: make note of the credentials to login to ElasticSearch Kibana WebUI
+  21. Deploy ELK Stack:
+    - cd ~/code/overwatch/helm/prom-graf-stack
+    - vi values.yaml (adjust as needed or leave defaults if not sure)
+    - ./promgraf.sh
+    - NB: make note of the credentials to login to Grafana WebUI
+  22. Deploy Ingress Custom Resource Defnitions:
+    - cd ~/code/overwatch/helm/cis/crds
+    - vi values.yaml (adjust as needed or leave defaults if not sure)
+    - ./promgraf.sh
+    - NB: make note of the credentials to login to Grafana WebUI
+
+Part VI
+
   7. Extract the ElasticSearch admin password using the following command:
                             PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')  
   8. Extract the Kibana Login URL: kibanaUrl=$(kubectl get service elastic-es-http)

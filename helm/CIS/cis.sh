@@ -1,5 +1,8 @@
 #!/bin/bash
 
+user="azops"
+pass="Canada123456"
+
 # create k8s secret to store BigIP creds
 kubectl create secret generic f5-bigip-ctlr-login -n kube-system --from-literal=username=azops --from-literal=password=Canada123456
 
