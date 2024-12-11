@@ -1,6 +1,6 @@
 ## Project Overwatch: Introduction
 
-This repo contains all the required manifests and documentation to build a modern observability stack built on opensource software components. The manifests folder contains everything required to deploy a pre-configured pre-plumbed observability stack comprised of:
+This repo contains all the required manifests and documentation to build a modern observability stack built on opensource software components. This implementation utilizes a Linux Virtual Machine as a Bastion Host to prepare a devops environment with all the necessary tools to required to deploy the pre-configured pre-plumbed observability stack which is comprised of:
 
   1. Logstash
   2. ElasticSearch
@@ -9,6 +9,8 @@ This repo contains all the required manifests and documentation to build a moder
   5. Prometheus
   6. Grafana
   7. NodeExporter
+
+This implementation utilizes F5 BigIP Virtual Instances deployed as an auto-scaleset to provide ingress services and ITSG compliant security controls for the solution. You will require between 2 and 5 HP-VE BEST Bundle License keys with IP Intelligence and Threat Campaigns add-ons. Contact you local F5 team for evaluation licenses if you want to kick the tires on this without any financial commmitment.
 
 NB: Autoscaling is not enabled by default. Manual scaling of both the F5 BIG-IP VMSS and the AKS deployments is left up to the user. This example supports up to a maximum of 5 instances in the VMSS. 
 
@@ -37,7 +39,6 @@ Part I: Regions, Resource Groups, VNets, Subnets, NatGW, NSGs
       - associate the intNsg with this subnet
     - external-subnet (default: 10.127.252.0/24)
       - associate the extNsg with this subnet
-
 Part II: Bastion Host
   7. From the Azure Marketplace, create a new Linux Virtual Machine using the Ubuntu 22.04-LTS:
     - Create a new resource
