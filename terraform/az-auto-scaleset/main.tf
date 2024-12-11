@@ -2,7 +2,7 @@
 
 # Azure Provider
 provider "azurerm" {
-  subscription_id = "b9922b70-7518-4b04-bf9d-3aabbca45b0a"
+  subscription_id = var.azureSubId
   features {}
 }
 
