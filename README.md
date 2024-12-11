@@ -190,7 +190,7 @@ Part V: Deploy the modern observability software stack
   #Grafana Ingress
   for i in `ls -1 *.yml`; do (kubectl apply -n elastic-system -f $i)
 ```
-### Part VI
+### Part VI: Initial Setup
   23. Extract the ElasticSearch admin password using the following command:
 ```bash
   #Fetch ES Creds
@@ -209,6 +209,30 @@ Part V: Deploy the modern observability software stack
   echo "Password: `kubectl get secret grafana -n elastic-system -o jsonpath="{.data.admin-password}" |base64 -d`"
   echo ""
 ```
+  25. Import the Kibana Dashboards
+    - Login to ElasticSearch with credentials retrieved in Step 23.
+    - In the Main Menu, select Stack Management
+    - In the new menu, under Kibana, select Data Management
+    - Select Dashboards
+    - Select Import
+    - Browse to the local copy of the kibana dashboards and select the first bundle (.ndjson)
+    - Repeat for the second and third bundle
+
+### Part V: Out of the box functionality
+
+The solution includes some pre-fabricated confgurations:
+  1. Logstash Input pipelines:
+      - Syslog
+        - 7514 UDP
+        - 7514 TCP
+        - 8514 TCP
+      - HEC
+        - 7080 HTTP
+      - Beats
+        - 5044 TCP
+  2. Prometheus Scrape Configs:
+      - f5BigIp
+        - By default Prometheus is configured to scrape Kubernetes metrics along with the F5 BigIP telemetry available from the VMSS cluster providing ingress services to the AKS cluster.
 
 ## Support
 
