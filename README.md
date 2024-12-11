@@ -34,13 +34,13 @@ This implementation is designed to deploy into an existing Azure resource-group 
       - The default name is overwatch-vnet
       - The default CIDR is 10.120.0.0/12
   6. Create 3 Subnets for the F5 BigIP VMSS cluster, associating the corresponding NSG created in Step 3:
-      - mgmt-subnet (default: 10.127.254.0/24)
-        - associate the Overwatch-natgw created in step 4 with the mgmt-subnet
-        - associate the mgmtNsg with this subnet
-      - internal-subnet (default: 10.127.253.0/24)
-        - associate the intNsg with this subnet
-      - external-subnet (default: 10.127.252.0/24)
-        - associate the extNsg with this subnet  
+        - mgmt-subnet (default: 10.127.254.0/24)
+          - associate the Overwatch-natgw created in step 4 with the mgmt-subnet
+          - associate the mgmtNsg with this subnet
+        - internal-subnet (default: 10.127.253.0/24)
+          - associate the intNsg with this subnet
+        - external-subnet (default: 10.127.252.0/24)
+          - associate the extNsg with this subnet  
 ### Part II: Bastion Host
   7. From the Azure Marketplace, create a new Linux Virtual Machine using the Ubuntu 22.04-LTS:
       - Create a new resource
