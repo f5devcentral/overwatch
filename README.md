@@ -225,6 +225,7 @@ The solution includes some pre-fabricated confgurations:
       - Syslog
         - 7514 UDP
         - 7514 TCP
+      - f5BigIpAWAF
         - 8514 TCP
       - HEC
         - 7080 HTTP
