@@ -238,3 +238,7 @@ variable "syslogRemoteAddr" {
   default = ""
   description = "Remote Syslog Collector IP address"
 }
+variable "azureSubId" {
+  default = ""
+  description = "Azure Subscription ID used to bind the deployment to your Azure Subscription"
+}

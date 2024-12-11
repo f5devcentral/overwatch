@@ -1,7 +1,7 @@
 ### Ubuntu - update
 sudo apt -y update
 sudo apt -y upgrade
-sudo apt -y install curl wget net-tools python3-pip ansible gnupg software-properties-common lsb-release apt-transport-https ca-certificates jq
+sudo apt -y install curl wget net-tools python3-pip ansible gnupg software-properties-common lsb-release apt-transport-https ca-certificates git jq nano
 
 ### Additional software repos
 # Terraform Repo

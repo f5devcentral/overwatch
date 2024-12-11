@@ -26,18 +26,19 @@ args:
   # OPTIONAL PARAMS -- uncomment and provide values for those you wish to use.
   # verify_interval:
   # node-poll_interval:
-  # log_level:
+  log_level: INFO
+  http-client-metrics: true
   # python_basedir: ~
   # VXLAN
   # openshift_sdn_name:
   # flannel_name:
   # KUBERNETES
-  default_ingress_ip: 0.0.0.0
+  default_ingress_ip: 10.127.252.11
   # kubeconfig:
   # namespaces: ["foo", "bar"]
   # namespace_label:
   # node_label_selector:
-  pool_member_type: auto
+  pool_member_type: nodeport
   # resolve_ingress_names:
   # running_in_cluster:
   # use_node_internal:
@@ -55,6 +56,26 @@ image:
   repo: k8s-bigip-ctlr
   pullPolicy: Always
   version: latest
+  livenessProbe:
+  failureThreshold: 3
+  httpGet:
+    path: /health
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 15
+  periodSeconds: 15
+  successThreshold: 1
+  timeoutSeconds: 15
+readinessProbe:
+  failureThreshold: 3
+  httpGet:
+    path: /health
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  successThreshold: 1
+  timeoutSeconds: 15
 # affinity:
 #   nodeAffinity:
 #     requiredDuringSchedulingIgnoredDuringExecution:
