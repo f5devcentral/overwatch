@@ -1,4 +1,4 @@
-## Project Overwatch: An Overview
+## Project Overwatch: Introduction
 
 This repo contains all the required manifests and documentation to build a modern observability stack built on opensource software components. The manifests folder contains everything required to deploy a pre-configured pre-plumbed observability stack comprised of:
 
