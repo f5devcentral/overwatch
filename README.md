@@ -79,7 +79,6 @@ Part II: Bastion Host
       - Service: SSH
       - Action: Allow
       - Click: Add
-    
 Part III: SSH to the Bastion Host and prepare your build envionment
   9. If using windows, install Windows Terminal along with OpenSSH client (available on the Windows Store) on your local workstation.
   10. Launch a Terminal session, and SSH to the Public IP address of the Bastion Host using the credentials settings supplied in Step 7.
@@ -112,7 +111,6 @@ Part III: SSH to the Bastion Host and prepare your build envionment
     - cd ~/code/overwatch/helm/cis
     - vi cis.sh
       - set the user and pass values to match those used when you deployed the F5 BigIP VMSS in Step 15
-
 Part IV: Deploy the infrastructure
   16. Deploy the F5 BigIP VMSS:
     - cd ~/code/overwatch/terraform/az-auto-scaleset
@@ -140,7 +138,6 @@ Part IV: Deploy the infrastructure
     - alias k=kubectl
     - source <(kubectl completion bash)
     - k get pods -A #you should not see any errors
-
 Part V: Deploy the modern observability software stack
   20. Deploy ELK Stack:
     - cd ~/code/overwatch/helm/eck-stack
@@ -157,12 +154,11 @@ Part V: Deploy the modern observability software stack
     - vi values.yaml (adjust as needed or leave defaults if not sure)
     - ./promgraf.sh
     - NB: make note of the credentials to login to Grafana WebUI
-
 Part VI
-
   7. Extract the ElasticSearch admin password using the following command:
-                            PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')  
-  8. Extract the Kibana Login URL: kibanaUrl=$(kubectl get service elastic-es-http)
+    -  PASSWORD=$(kubectl get secret elastic-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')  
+  8. Extract the Kibana Login URL: 
+    - kibanaUrl=$(kubectl get service elastic-es-http)
 
   ![image](https://github.com/user-attachments/assets/7ffa68c2-efd7-4638-a104-b431eafa43a6)
 
@@ -171,22 +167,6 @@ Part VI
     Login with username 'elastic' and password retrieved in step 7. 
     
   Happy ELK'ing!
-
-## Installation
-
-  1. Create a Resource Group (RG) in the Azure region of your choice. Make note of the name and the region you chose.
-  2. Create a new Virtual Network (VNET) in the RG created in step 1: 10.112.0.0/12
-  3. Create three new Network Security Groups in the RG created in step 1: 
-    - mgmtNsg: 10.127.254.0/24
-    - extNsg: 10.127.252.0/24
-    - intNsg: 10.127.253.0/24
-
-  4. Create a three new Subnets in the VNET created in step 2:
-    - mgmt-subnet: 10.127.254.0/24
-    - external-subnet: 10.127.252.0/24
-    - internal-subnet: 10.127.253.0/24
-
-  5. Create 
 
 ## Usage
 
