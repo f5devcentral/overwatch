@@ -8,16 +8,86 @@ This repo contains all the required manifests and documentation to build a moder
   4. AlertManager
   5. Prometheus
   6. Grafana
+  7. NodeExporter
 
 NB: Autoscaling is not enabled by default. Manual scaling of both the F5 BIG-IP VMSS and the AKS deployments is left up to the user. This example supports up to a maximum of 5 instances in the VMSS. 
 
 ## Getting Started
 
+This implementation is designed to deploy into an existing Azure resource-group and properly configured virtual network. If required, use these steps to build these dependencies using the method of your choice:
+
+Part I: Regions, Resource Groups, VNets, Subnets, NatGW, NSGs
   1. Clone the repo to your local environment.
-  2. Create an aks/eks/gke/roll-you-own k8s cluster with dynamic storage provisioning support configured and enabled.
-  3. Configure kubectl to remotely configure the k8s cluster.
-  4. Using your CLI of choice, in the manifests/setup folder, run: 
-                            kubectl apply -f ./*.yaml --server-side
+  2. Create a Resource Group in the Azure region of your choice.
+  3. Create 3 Network Security Groups:
+    - mgmtNsg (default ruleset)
+    - extNsg (default ruleset)
+    - intNsg (default ruleset)
+  4. Create a NAT Gateway & Public IP address for it.
+    - default: Overwatch-natgw-pip
+    - default: Overwatch-natgw
+  5. Create a VNet with a large address space (/12). 
+    - The default name is overwatch-vnet
+    - The default CIDR is 10.120.0.0/12
+  6. Create 3 Subnets for the F5 BigIP VMSS cluster, associating the corresponding NSG created in Step 3:
+    - mgmt-subnet (default: 10.127.254.0/24)
+      - associate the Overwatch-natgw created in step 4 with the mgmt-subnet
+      - associate the mgmtNsg with this subnet
+    - internal-subnet (default: 10.127.253.0/24)
+      - associate the intNsg with this subnet
+    - external-subnet (default: 10.127.252.0/24)
+      - associate the extNsg with this subnet
+
+Part II: Bastion Host
+  7. From the Azure Marketplace, create a new Linux Virtual Machine using the Ubuntu 22.04-LTS:
+    - Create a new resource
+    - Search: Ubuntu Server 22.04 LTS
+    - On the first search result, click Create
+      - Resource group: Use RG created in Step 2
+      - Virtual machine name: tux
+      - Region: Canada Central / Canada East
+      - Availability Zone: Zone 1
+      - Security type: Trusted launch virtual machines
+      - Image: Ubuntu Server 22.04 LTS - x64 Gen2
+      - Size: Standard_D4s_v3 - 4 vcpus, 16 GiB memory
+      - Authentication Type: SSH public key / password (your choice)
+        - Username: azops
+        - SSH Public key source: 
+          - if SSH Public key auth: Generate new key pair
+            - SSH Key Type: RSA SSH Format
+        - Key  Pair name: tux
+      - Authentication Type: Password (your choice)
+        - Username: azops
+        - Password: Default1235!
+        - Confirm Password: Default123345!
+      - Public Inbound ports: none
+    - At the top of the form, click on Networking
+      - Virtual Network: Overwatch-vnet
+      - Subnet: mgmt-subnet
+      - Public IP: (new)
+      - NIC network security group: none
+      - Enable accelerated networking: true
+      - Load balancing options: none
+    - Click Review + Create
+    - Once the resource is created, select it and then start the virtual machine
+  8. While the VM is booting, edit the mgmtNSG and add a rule to allow inbound SSH connections from your workstation:
+    - Inside the resource group created in Step 2, Click on mgmtNSG
+    - Click Settings -> Inbound security rules -> Add
+      - Source: My IP Address
+      - Destination: Any
+      - Service: SSH
+      - Action: Allow
+      - Click: Add
+    
+Part III: SSH to the Bastion Host to prepare your build envionment
+  9. If using windows, install Windows Terminal along with OpenSSH client (available on the Windows Store) on your local workstation.
+  10. Launch a Terminal session, and SSH to the Public IP address of the Bastion Host using the credentials settings supplied in Step 7.
+  11. Execute the commands as show in the repo artifact located here: https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/build_ubuntu_vms.sh
+    - Install all OS updates and security patches
+    - Install Terraform
+    - Install kubectl
+    - Install k9s
+    - Install Azure CLI
   5. Using your CLI of choice, in the manifests/elk folder, run: 
                             kubectl apply -f ./*.yaml
   6. Using your CLI of choice, in the manifests folder, run: 

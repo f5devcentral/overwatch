@@ -1,7 +1,7 @@
 ### Ubuntu - update
-apt -y update
-apt -y upgrade
-apt -y install curl wget net-tools python3-pip ansible gnupg software-properties-common lsb-release apt-transport-https ca-certificates jq
+sudo apt -y update
+sudo apt -y upgrade
+sudo apt -y install curl wget net-tools python3-pip ansible gnupg software-properties-common lsb-release apt-transport-https ca-certificates jq
 
 ### Additional software repos
 # Terraform Repo
@@ -23,21 +23,25 @@ curl -fsSL https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_linux_a
 # filebeat agent
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.15.3-amd64.deb && sudo dpkg -i filebeat-8.15.3-amd64.deb
 
-# Install Docker using get-docker.sh:
-#curl -fsSL https://get.docker.com -o get-docker.sh &&
-#sudo sh ./get-docker.sh --dry-run &&
-#sudo sh ./get-docker.sh
-#sudo systemctl start docker
-#sudo systemctl enable docker
-
 # AZ CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# rSyslogd Configuration for remote logging
-sudo cat <<-EOF >> /etc/rsyslog.d/50-default.conf
-*.*  action(type="omfwd" target="192.0.2.2" port="7514" protocol="tcp"
-            action.resumeRetryCount="100"
-            queue.type="linkedList" queue.size="10000")
-EOF
-sudo systemctl restart rsyslogd
+function dockerInstall () {
+    # Install Docker using get-docker.sh:
+    curl -fsSL https://get.docker.com -o get-docker.sh &&
+    sudo sh ./get-docker.sh --dry-run &&
+    sudo sh ./get-docker.sh
+    sudo systemctl start docker
+    sudo systemctl enable docker
+}
 
+
+function rsyslogConfig () {
+    # rSyslogd Configuration for remote logging
+    sudo cat <<-EOF >> /etc/rsyslog.d/50-default.conf
+    *.*  action(type="omfwd" target="192.0.2.2" port="7514" protocol="tcp"
+                action.resumeRetryCount="100"
+                queue.type="linkedList" queue.size="10000")
+    EOF
+    sudo systemctl restart rsyslogd;
+}
