@@ -16,6 +16,12 @@ This implementation utilizes F5 BigIP Virtual Instances deployed as an auto-scal
 
 NB: Autoscaling is not enabled by default. Manual scaling of both the F5 BIG-IP VMSS and the AKS deployments is left up to the user. This example supports up to a maximum of 5 instances in the VMSS. 
 
+## Solution Design
+
+This solution was designed an implemented Government of Canada federal clients in mind and all the constraints and regulatory compliance that comes with that type of deployment pattern. These constraints force certain design choices that might otherwise not be optimal. 
+
+For extended details on the solution design please refer to the [DESIGN.md](https://github.com/f5devcentral/overwatch/blob/main/DESIGN.md) page.
+
 ## Getting Started
 
 This implementation is designed to deploy into an existing Azure resource-group and properly configured virtual network. If required, use these steps to build these dependencies using the method of your choice:
@@ -167,13 +173,13 @@ Part V: Deploy the modern observability software stack
   20. Deploy ELK Stack:
 ```bash
   cd ~/code/overwatch/helm/eck-stack
-  vi values.yaml (adjust as needed or leave defaults if not sure)
+  vi values.yaml #(adjust as needed or leave defaults if not sure)
   ./eck.sh
 ```
   21. Deploy ELK Stack:
 ```bash
   cd ~/code/overwatch/helm/prom-graf-stack
-  vi values.yaml (adjust as needed or leave defaults if not sure)
+  vi values.yaml #(adjust as needed or leave defaults if not sure)
   ./promgraf.sh
 ```
   22. Deploy Ingress Custom Resource Defnitions:
