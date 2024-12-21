@@ -1,14 +1,14 @@
 apiVersion: "cis.f5.com/v1"
 kind: VirtualServer
 metadata:
-  namespace: default
+  namespace: argocd
   name: argocd-ingress-https-vs
   labels:
     f5cr: "true"
 spec:
   virtualServerAddress: 10.127.252.11
-  virtualServerHTTPPort: 8080
-  virtualServerHTTPSPort: 8443
+  virtualServerHTTPPort: 9080
+  virtualServerHTTPSPort: 9443
   virtualServerName: argocd-ingress-https-vs
   snat: auto
   allowVlans: ["/Common/external"]
@@ -21,7 +21,7 @@ spec:
   httpTraffic: redirect
   pools:
   - path: /
-    service: argocd-stack
+    service: argocd-stack-server
     servicePort: 80
     reselectTries: 3
     serviceDownAction: reselect
@@ -37,7 +37,7 @@ apiVersion: cis.f5.com/v1
 kind: TLSProfile
 metadata:
   name: argo-terminate-tls13
-  namespace: default
+  namespace: argocd
   labels:
     f5cr: "true"
 spec:
