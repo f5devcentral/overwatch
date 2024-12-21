@@ -46,7 +46,7 @@ The User Experience is an essential aspect of the platforms success or failure. 
 ![alt text](images/image-12.png)
 ![alt text](images/image-13.png)
 
-### Grafana
+### GrafanaLabs
 
 ![alt text](images/image-14.png)
 
