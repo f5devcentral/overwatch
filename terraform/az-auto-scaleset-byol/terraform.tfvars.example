@@ -1,0 +1,54 @@
+# BIG-IP Licenses
+f5_license_keys = [
+    "XXXXX-YIUCD-XIEKW-KWENW-ZZZZZZZ",
+    "GDUUC-XXXXX-ZUGMV-ZZZZZ-NEUBNOS",
+    "BPHDD-XTEZS-XXXXX-ZCQIY-YAGXOZA",
+    "PXECS-ZZZZZ-FDIIJ-XXXXX-MPCYJEU",
+    "ZZZZZ-PEKEH-LEQUP-FACYP-XXXXXXX"
+]
+
+# BIG-IP Environment
+f5_username = "azureuser"
+f5_password = "Default12345!"
+ssh_key     = "~/.ssh/id_rsa.pub"
+vnet_rg     = "myVnetRg"
+vnet_name   = "myVnet123"
+mgmtSubnet  = "mgmt"
+extSubnet   = "external"
+intSubnet   = "internal"
+mgmtNsg     = "mgmtNsg"
+extNsg      = "extNsg"
+intNsg      = "intNsg"
+
+# Azure Environment
+azureSubId    = "b9922b70-7518-4b04-bf9d-3aabbca45b0a"
+location      = "canadacentral"
+projectPrefix = "Sentinal"
+resourceOwner = "s.hillier@f5.com"
+
+# Image uri
+instance_type   = "Standard_DS5_v2"
+product         = "f5-big-ip-byol"
+image_name      = "f5-big-all-2slot-byol"
+bigip_version   = "17.1.200000"
+
+# Network
+dns_suffix  = "f5demo.com"
+vm_name     = "f5BigIp"
+
+# VMSS Sizing
+instances = "5"
+
+# Key Vault - Uncomment to use Key Vault integration
+#az_keyvault_authentication = true
+#keyvault_rg                = "myKv-rg-123"
+#keyvault_name              = "myKv-123"
+#user_identity              = "/subscriptions/xxxx/resourceGroups/myRg123/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myManagedId123"
+
+# Artifact URLs
+INIT_URL    = "https://github.com/f5devcentral/overwatch/raw/refs/heads/main/f5BigIp/atc/f5-bigip-runtime-init-2.0.3-1.gz.run"
+DO_URL      = "https://github.com/f5devcentral/overwatch/raw/refs/heads/main/f5BigIp/atc/f5-declarative-onboarding-1.46.0-7.noarch.rpm"
+AS3_URL     = "https://github.com/f5devcentral/overwatch/raw/refs/heads/main/f5BigIp/atc/f5-appsvcs-3.53.0-7.noarch.rpm"
+TS_URL      = "https://github.com/f5devcentral/overwatch/raw/refs/heads/main/f5BigIp/atc/f5-telemetry-1.37.0-1.noarch.rpm"
+WEBTOP_URL  = "https://github.com/f5devcentral/overwatch/raw/refs/heads/main/f5BigIp/webtop.tgz"
+WEBSSH_URL  = "https://github.com/f5devcentral/overwatch/raw/refs/heads/main/f5BigIp/webssh.tgz"

@@ -5,9 +5,9 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 # install prometheus-grafana stack
-helm upgrade --install -f values.yaml grafana-labs-stack prometheus-community/kube-prometheus-stack
+helm upgrade --install grafana-labs-stack prometheus-community/kube-prometheus-stack -n grafana-system --create-namespace --values ./values.yaml
 
 # show grfana admin creds
 echo "Username: admin"
-echo "Password: `kubectl get secret grafana -n elastic-system -o jsonpath="{.data.admin-password}" |base64 -d`"
+echo "Password: `kubectl get secret grafana -n grafana-system -o jsonpath="{.data.admin-password}" |base64 -d`"
 echo ""

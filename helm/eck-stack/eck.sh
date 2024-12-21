@@ -4,6 +4,26 @@
 helm repo add elastic https://helm.elastic.co
 helm repo update
 
+#ES Scheduler Priority settings
+cluUrl="_cluster/settings"
+cat <<-EOF >> es-priority-classes.yaml
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: elastic-cluster-high-priority
+value: 10000000
+globalDefault: false
+description: "This priority class should be used for elasticsearch cluster pods only."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: filebeat-high-priority
+value: 2000000
+globalDefault: false
+description: "This priority class should be used for filebeat pods only."
+EOF
+
 # install Elastic CRDs and Operator
 #helm upgrade --install elastic-operator-crds elastic/eck-operator-crds
 helm upgrade --install elastic-operator elastic/eck-operator -n elastic-system --create-namespace

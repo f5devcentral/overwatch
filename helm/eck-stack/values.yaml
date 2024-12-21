@@ -2,7 +2,7 @@
 eck-elasticsearch:
   volumeClaimDeletePolicy: DeleteOnScaledownAndClusterDeletion
   nodeSets:
-  - name: default
+  - name: masters
     count: 5
     volumeClaimTemplates:
     - metadata:
@@ -12,8 +12,8 @@ eck-elasticsearch:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
-        storageClassName: managed-csi
+            storage: 100Gi
+        storageClassName: managed-csi #this must match the persistent volume storage provider driver-name
     config:
       # Comment out when setting the vm.max_map_count via initContainer, as these are mutually exclusive.
       # For production workloads, it is strongly recommended to increase the kernel setting vm.max_map_count to 262144
@@ -24,24 +24,85 @@ eck-elasticsearch:
       #search.max_async_search_response size 20965760
     podTemplate:
       spec:
+        priorityClassName: elastic-cluster-high-priority
         #This init container ensures that max_map_count setting is applied before starting Elasticsearch
         initContainers:
-        - name: max-map-count-check
-          command: ['sh', '-c', "while true; do mmc=$(cat /proc/sys/vm/max_map_count); if [ ${mmc} -eq 262144 ]; then exit 0; fi; sleep 1; done"]
+        - name: sysctl
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
         containers:
         - name: elasticsearch
           resources:
             limits:
-              memory: 4Gi
-              cpu: 4
-            requests:
               memory: 8Gi
               cpu: 8
-          env:
-          - name: ES_JAVA_OPTS
-            value: -Xms4096m -Xmx8192m
-      service:
-        type: ClusterIP
+            requests:
+              memory: 4Gi
+              cpu: 4
+  - name: data
+    count: 1
+    config:
+      node.roles: ["data", "ingest"]
+    podTemplate:
+      spec:
+        priorityClassName: elastic-cluster-high-priority
+        containers:
+        - name: elasticsearch
+          resources:
+            limits:
+              cpu: 4
+              memory: 8Gi
+            requests:
+              cpu: 2
+              memory: 4Gi
+        initContainers:
+        - name: sysctl
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+  - name: data-warm
+    count: 1
+    config:
+      node.roles: ["data", "data_warm"]
+    podTemplate:
+      spec:
+        priorityClassName: elastic-cluster-high-priority
+        containers:
+        - name: elasticsearch
+          resources:
+            limits:
+              cpu: 4
+              memory: 8Gi
+            requests:
+              cpu: 2
+              memory: 4Gi
+        initContainers:
+        - name: sysctl
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 150Gi
 eck-kibana:
   enabled: true
   spec:
@@ -54,14 +115,14 @@ eck-kibana:
         - name: kibana
           env:
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=2048"
+              value: "--max-old-space-size=4096"
           resources:
             requests:
-              memory: 2Gi
-              cpu: 2
-            limits:
-              memory: 5Gi
+              memory: 4Gi
               cpu: 4
+            limits:
+              memory: 8Gi
+              cpu: 8
     http:
       service:
         spec:
@@ -86,6 +147,7 @@ eck-beats:
       podTemplate:
         spec:
           automountServiceAccountToken: true
+          priorityClassName: filebeat-high-priority
           initContainers:
             - name: download-tutorial
               image: curlimages/curl
@@ -98,10 +160,10 @@ eck-beats:
             - name: filebeat
               resources:
                 requests:
-                  memory: 4Gi
+                  memory: 2Gi
                   cpu: 2
                 limits:
-                  memory: 8Gi
+                  memory: 4Gi
                   cpu: 4
               securityContext:
                 runAsUser: 1000
@@ -133,7 +195,7 @@ eck-logstash:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 100Gi
       storageClassName: managed-csi
   config:
     #nothing for now
@@ -144,13 +206,13 @@ eck-logstash:
         resources:
           requests:
             memory: 4Gi
-            cpu: 2
+            cpu: 4
           limits:
             memory: 8Gi
-            cpu: 4
-        env:
-        - name: LS_JAVA_OPTS
-          value: -Xms4096m -Xmx8192m
+            cpu: 8
+        #env:
+        #- name: LS_JAVA_OPTS
+        #  value: -Xms4096m -Xmx8192m
   pipelines:
     - pipeline.id: http
       config.string: |
@@ -179,7 +241,7 @@ eck-logstash:
         input {
           tcp {
             port => 8514
-            type => f5BigIpAWAF
+            type => waf-logs
             codec => plain { charset=> "ISO-8859-1" }
           }          
           syslog {
@@ -205,7 +267,7 @@ eck-logstash:
               replace => { "[@metadata][index_prefix]" => "syslog" }
             }
           }
-          if [type] == "f5BigIpAWAF" {
+          if [type] == "waf-logs" {
               grok {
                 match => {
                   "message" => [
@@ -276,7 +338,7 @@ eck-logstash:
               split => { "sub_violations" => "," }
               split => { "threat_campaign_names" => "," }
               split => { "violations" => "," }
-              replace => { "[@metadata][index_prefix]" => "syslog" }
+              replace => { "[@metadata][index_prefix]" => "waf-logs" }
               remove_field => [
                 "[violation_details][violation_masks]",
                 "violation_details_xml",

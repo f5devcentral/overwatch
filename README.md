@@ -188,7 +188,7 @@ Part V: Deploy the modern observability software stack
   #ECK Ingress
   for i in `ls -1 *.yaml`; do (kubectl apply -n elastic-system -f $i)
   #Grafana Ingress
-  for i in `ls -1 *.yml`; do (kubectl apply -n elastic-system -f $i)
+  for i in `ls -1 *.yml`; do (kubectl apply -n grafana-system -f $i)
 ```
 ### Part VI: Initial Setup
   23. Extract the ElasticSearch admin password using the following command:

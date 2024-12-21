@@ -1,0 +1,302 @@
+{
+    "class": "ADC",
+    "schemaVersion": "3.16.0",
+    "remark": "Configure BIG-IP Common/Shared objects",
+    "Common": {
+        "Shared": {
+            "class": "Application",
+            "template": "shared",
+            "maintenance_rule": {
+                "remark": "Default Maintenance iRule",
+                "class": "iRule",
+                "iRule": "when HTTP_REQUEST {\n     HTTP::respond 200 content \" <!DOCTYPE html PUBLIC \\\"-//W3C//DTD XHTML 1.0 Transitional//EN\\\" \\\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\\\"> <html xmlns=\\\"http://www.w3.org/1999/xhtml\\\"> <head> <title>Maintenance Page</title> </head> <body> <div align=\\\"center\\\"> <h2> BigIP: $static::tcl_platform(machine) <br /> [clock format [clock seconds] -format \"%a, %d %h %Y %T GMT\"] : [IP::client_addr] => [IP::local_addr] </h2> <div id=\\\"maintenanceHeader\\\" align=\\\"center\\\"> <svg xmlns=\\\"http://www.w3.org/2000/svg\\\" viewBox=\\\"0 0 88 88\\\"> <circle r=\\\"44\\\" cy=\\\"44\\\" cx=\\\"44\\\" fill=\\\"#E21D38\\\"></circle> <path stroke=\\\"null\\\" d=\\\"M43.02 48.22c21.63 1.8 29.95 7.75 29.56 15.88-.4 4.36-4.57 8.52-9.92 8.93-6.34.4-9.33-2.2-11.1-4.97-1.6-2.57-3.38-5.16-5.17-7.94-.4-.8-1.2-.2-1.8.2-1.4 1.2-2.6 2.58-3.8 3.78-.7.78-.5 1.4-.3 1.98 1.2 2.78 2.4 5.56 3.6 8.13 1.9 1.2 10.8 2.8 17.4 2.2 4.6-.4 10.1-2.2 14.9-5.5 4.6-3.6 7.9-8.3 8.5-16.1.2-4.7-.6-9.6-4.78-14.2s-11.3-8.3-25.8-9.3c.8-2.3 1.4-4.5 2.2-6.73 8.75.4 16.5 1 23.04 1.8.6-2.5.8-4.95 1.4-7.36l-1.8-2.1c-3.36-.42-6.55-1.22-10.1-1.62-4.55-.6-9.3-1-14.46-1.2-3.4 9.57-7.4 21.64-11.6 34.3m-5.8-37.1c-1.6 0-3.76.4-7.33 1.2-7.73 2.2-17.24 7.54-18.24 16.45-.2 1.4-.2 3-.4 4.3l-6.13.6C5 35.6 5 37.2 4.8 39c2-.2 3.97-.2 6.15-.4-.4 9.36 0 18.7.8 27.37.2 1.4.2 2.6.2 3.4-.2.82-1.6 1.22-3.57 1.22l2.6 3.1c7.56 1.4 17.1 2.4 27.18 2.6v-3c-5.97-.4-8.7-1.2-9.1-2.4-.4-1-.4-2.4-.6-3.8-.4-9.1-.6-19.1-.4-29.2 3.43 0 6.75 0 10.17-.2 1.8-.8 3.4-1.6 5-2.4v-3.4c-5.17 0-10.13.2-15.1.2l.6-11.9c.2-2.6 1.98-4.4 3.57-4.4 2.77-.2 5.33.98 7.92 2.17 1.4.6 2.8 1.4 4.18 2 .6.2 1.4.4 2-.23.8-.97 1.6-1.97 2.38-2.76.4-.6.2-1 0-1.2l-5.38-4c-1-.8-2.8-.8-4.4-.8-.6-.2-1.2 0-1.8 0\\\" fill=\\\"#FFF\\\"></path> <text x=\\\"80\\\" y=\\\"85\\\" font-size=\\\"14\\\" font-face=\\\"sans-serif\\\" fill=\\\"#E21D38\\\">®</text> </svg> </div> <div id=\\\"maintenanceBody\\\" align=\\\"center\\\"> <strong>This site is in maintenance now.</strong> <br /><br /> </div> </div> </body> </html>\\\" \n}"
+            },
+            "wildcardAddress": {
+                "class": "Service_Address",
+                "virtualAddress": "0.0.0.0"
+            },
+            "wildcardCertificate": {
+                "class": "Certificate",
+                "remark": "in practice we recommend using a passphrase",
+                "certificate": "-----BEGIN CERTIFICATE-----\nMIIDtTCCAp2gAwIBAgIBAzANBgkqhkiG9w0BAQsFADBGMQswCQYDVQQGEwJVUzET\nMBEGA1UECAwKQ2FsaWZvcm5pYTESMBAGA1UECgwJTXlDb21wYW55MQ4wDAYDVQQD\nDAVsYWJDQTAeFw0xOTA0MjUyMzM3NDVaFw0yOTA0MjIyMzM3NDVaMF8xCzAJBgNV\nBAYTAkNBMRAwDgYDVQQIEwdPbnRhcmlvMRQwEgYDVQQKEwtGNSBOZXR3b3JrczEO\nMAwGA1UECxMFU2FsZXMxGDAWBgNVBAMTD3dlYnRvcC5mNXNlLmNvbTCCASIwDQYJ\nKoZIhvcNAQEBBQADggEPADCCAQoCggEBAO6mWzsOY0UuRzSiVU65gmlSit4d7tW4\nE/kWYY3LT/dxG2V/kzHhO70amNCTDVv5oAKkToLYCdJNWWxEI+EgUigDtg/v4E1R\nH0KEQdGC6RHnYK8kOmWWm9Pminh1P1o03QiJ41zj5KcyFYJq4pFRctN5iPs0+F/Y\n5JBDbPcnuk3OuRLxI67tPwqAQQurXcvGzCYF1y1zxlHxxWyUbuTdCo3GeO2Vo3bN\nMSTSj9hmxc8QEXif1qA/KDnLtY+IemptJT5aC0WZRwp2lncKOpSLcMcdQAprxHYA\n6LLkztNqVwCXQFjA7zfVRXV63JGhjV+oR4O8yemLffUVydihXzcsruMCAwEAAaOB\nlDCBkTAJBgNVHRMEAjAAMB0GA1UdDgQWBBRjzhMuUopHVdDvj9xvCskIPacvQzAf\nBgNVHSMEGDAWgBQMgRSSF2oS8RCZJADBj3YSv90EsTAOBgNVHQ8BAf8EBAMCBeAw\nNAYDVR0lAQH/BCowKAYIKwYBBQUHAwIGCCsGAQUFBwMBBggrBgEFBQcDAwYIKwYB\nBQUHAwQwDQYJKoZIhvcNAQELBQADggEBAKxtUE9tImn6MF0E2RNYeaTkIyCozjPw\nARofuW4eE5VKoZyq8JCbzUG44yT8gCSAj24LYuM7mk9CceHpu4pSyLHuptP1W8ZT\nzpy4BPHaeFoJZCgBW8KkOdlW/4WRTmbfG3YaxPClOj7f5P4Tkw2XaftPJqQWZnCx\npEBU8e5AVOSmV1/vkhEi5FjV1aCXEm2DH9TJQtxABKGCaNtwnS701mmJH0HWlDSm\nMyBI/jTOO2XMoWGEzL9pIMiPPGZZbGWUIfvfhsgBFnJoSUa9ijteR5CLhX7DIfAl\njuMTHgWmsN80SOIEUaLYNfeFQxkgL0uVc8nzc3JGN+78h+Ktg4piRCM=\n-----END CERTIFICATE-----",
+                "privateKey": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDupls7DmNFLkc0\nolVOuYJpUoreHe7VuBP5FmGNy0/3cRtlf5Mx4Tu9GpjQkw1b+aACpE6C2AnSTVls\nRCPhIFIoA7YP7+BNUR9ChEHRgukR52CvJDpllpvT5op4dT9aNN0IieNc4+SnMhWC\nauKRUXLTeYj7NPhf2OSQQ2z3J7pNzrkS8SOu7T8KgEELq13LxswmBdctc8ZR8cVs\nlG7k3QqNxnjtlaN2zTEk0o/YZsXPEBF4n9agPyg5y7WPiHpqbSU+WgtFmUcKdpZ3\nCjqUi3DHHUAKa8R2AOiy5M7TalcAl0BYwO831UV1etyRoY1fqEeDvMnpi331FcnY\noV83LK7jAgMBAAECggEAE06WFuMFGPWzgQiZCjNr34V0AqA9UEECLKao4cXPBF+8\nLavyhpiIMrZSIp2i+Qvq7AvK5j8AHGlxkJa6qF3rB521PvjTFq43bzQv9vk2TeKA\nKesuZkWW+b+u+CvUIkIgl65AHKW7O+OLZe+rwMHsHju430nbxjVP2HP7/srSAbVN\nt3yyXPmI4VSB2P8NzkYCzr/B46LcS/2OBno9iwjQwDspQNJhpUmxPsFfG0OS0WWh\nqLgpUvG8GEPkCv8fRjjrqh9iJ3kZOpmv5nQ1OE0ypwYoPhJDiJAAZiXRtPImoM06\n2M6CbvtdunRuVvVNBYgu75jRgunZycQJP48tWWcWsQKBgQD7/X1WKBIqJRZcDYTf\n8pHFDzZxhDOpYX31vddk7A3xv9XvqQVCu6hkbFvMu5b80AOeYlo2SCvaA97sS7Bp\nbafoT6ZCwBztEBjk9v+X0LOSg847c/ik3+M9Nsnpv9N0qdjGtPgm8Kb15PaiHYAH\nT6kLkvYCFS5G17B2sVoOoWg7fQKBgQDycoX2+FPMPFqUesZ3BlAcZM8sVFTg1VL6\nRGesJLrT/3ueOUiCWjjcJlPodBNg2Y8N3hQV0CdwGxR14nKoVw0vpv+r/iJp1F7s\nsGqjtMIw6fHdqPdX2GIvraIxU+j8p94R1ACii3aztqcluJ1S8CsNmUxgUoMJKtO/\ntvNB4Pjh3wKBgELz/kpXCUSDaCZ7PRPXup12RkvxCVz212Xk1AcvpSDXjLtJ2Gj7\nvWk5VUbXjO2NQ3jgvwFvOZ+Kqb90+OF6TkOubgmMS+M9BLBJZG3s+Nl0BebMEIOW\nLSWFmi5uVnvH6R4a1VhbVrE87b7zQaIvq0W0/YJeKFaQVoWi57+9aRltAoGBANV/\n5FjH9YM04s8+Dudht8pJO+ddnCEhuiCJfIIrFhr6MHH1H9UqfkffuKRLE4WGEGO1\n3RoYY6JlNm9ZKn7zqbj85ske0k8/pRfpgv8Gfrt0SHlaAfZppo016k5mBhX3/abV\nenmpNq6reiXNnT0cIc2n4YoxHxNDk5SQF0c8Re8hAoGATtdkvUp4f6A4v9ppdJZs\npz7M6/NbKGJH9F3GZseSKTBKgtndiBugrfePOrcdC+4O0i33lvWDOs70kREC4wCG\nXMt36aS9Z384Pl7Z7FhiVQrTF2ZuRP/6v1r3iJDHixmJYQzjBO2Zh1D7Sf39BxOv\n2h0dFcPMKaZcLsXTFH1qS0I=\n-----END PRIVATE KEY-----"
+            },
+            "wildcardClientssl": {
+                "certificates": [
+                    {
+                        "certificate": "wildcardCertificate"
+                    }
+                ],
+                "ciphers": "DEFAULT",
+                "requireSNI": false,
+                "class": "TLS_Server"
+            },
+            "lb_healthProbe_rule": {
+                "remark": "Respond to LB healthProbe",
+                "class": "iRule",
+                "iRule": "when CLIENT_ACCEPTED {\n  TCP::close\n}"
+            },
+            "lb_healthProbe_vs": {
+                "class": "Service_TCP",
+                "remark": "LB Health Probe VS",
+                "virtualPort": 666,
+                "virtualAddresses": [
+                    { "use": "wildcardAddress" }
+                ],
+                "iRules": [
+                    "lb_healthProbe_rule"
+                ]
+            },
+            "telemetry_local_rule": {
+                "remark": "Only required when TS is a local listener",
+                "class": "iRule",
+                "iRule": "when CLIENT_ACCEPTED {\n  node 127.0.0.1 6514\n}"
+            },
+            "telemetry_local": {
+                "remark": "Only required when TS is a local listener",
+                "class": "Service_TCP",
+                "virtualAddresses": [
+                    "255.255.255.254"
+                ],
+                "virtualPort": 6514,
+                "iRules": [
+                    "telemetry_local_rule"
+                ]
+            },
+            "telemetry": {
+                "class": "Pool",
+                "members": [
+                    {
+                        "enable": true,
+                        "serverAddresses": [
+                            "255.255.255.254"
+                        ],
+                        "servicePort": 6514
+                    }
+                ],
+                "monitors": [
+                    {
+                        "bigip": "/Common/tcp"
+                    }
+                ]
+            },
+            "telemetry_hsl": {
+                "class": "Log_Destination",
+                "type": "remote-high-speed-log",
+                "protocol": "tcp",
+                "pool": {
+                    "use": "telemetry"
+                }
+            },
+            "telemetry_formatted": {
+                "class": "Log_Destination",
+                "type": "splunk",
+                "forwardTo": {
+                    "use": "telemetry_hsl"
+                }
+            },
+            "telemetry_publisher": {
+                "class": "Log_Publisher",
+                "destinations": [
+                    {
+                        "use": "telemetry_formatted"
+                    }
+                ]
+            },
+            "telemetry_traffic_log_profile": {
+                "class": "Traffic_Log_Profile",
+                "responseSettings": {
+                    "responseEnabled": true,
+                    "responseProtocol": "mds-tcp",
+                    "responsePool": {
+                        "use": "telemetry"
+                    },
+                    "responseTemplate": "event_source=\"response_logging\",hostname=\"$BIGIP_HOSTNAME\",client_ip=\"$CLIENT_IP\",server_ip=\"$SERVER_IP\",http_method=\"$HTTP_METHOD\",http_uri=\"$HTTP_URI\",response_msec=\"$RESPONSE_MSEC\",response_size=\"RESPONSE_SIZE\",virtual_name=\"$VIRTUAL_NAME\",event_timestamp=\"$DATE_HTTP\""
+                }
+            },
+            "telemetry_security_log_profile": {
+                "class": "Security_Log_Profile",
+                "application": {
+                    "localStorage": false,
+                    "remoteStorage": "splunk",
+                    "protocol": "tcp",
+                    "servers": [
+                        {
+                            "address": "255.255.255.254",
+                            "port": "6514"
+                        }
+                    ],
+                    "storageFilter": {
+                        "requestType": "illegal-including-staged-signatures"
+                    }
+                }
+            },
+            "hsl_logs": {
+                "class": "Pool",
+                "members": [
+                    {
+                        "enable": true,
+                        "serverAddresses": [
+                            "10.120.0.125"
+                        ],
+                        "servicePort": 6514
+                    }
+                ],
+                "monitors": [
+                    {
+                        "bigip": "/Common/tcp"
+                    }
+                ]
+            },
+            "logDest_hsl": {
+                "class": "Log_Destination",
+                "type": "remote-high-speed-log",
+                "protocol": "tcp",
+                "pool": {
+                    "use": "hsl_logs"
+                }
+            },
+            "logDest_formatted": {
+                "class": "Log_Destination",
+                "type": "splunk",
+                "forwardTo": {
+                    "use": "logDest_hsl"
+                }
+            },
+            "logDest_publisher": {
+                "class": "Log_Publisher",
+                "destinations": [
+                    {
+                        "use": "logDest_formatted"
+                    }
+                ]
+            },
+            "hsl_security_log_profile": {
+                "class": "Security_Log_Profile",
+                "application": {
+                    "localStorage": false,
+                    "remoteStorage": "splunk",
+                    "protocol": "tcp",
+                    "reportAnomaliesEnabled": true,
+                    "servers": [
+                        {
+                            "address": "logstash-syslog.f5demo.com",
+                            "port": "6514"
+                        }
+                    ],
+                    "storageFilter": {
+                        "requestType": "all"
+                    }
+                },
+                "dosApplication": {
+                    "localPublisher": "enabled",
+                    "remotePublisher": {
+                        "use": "logDest_publisher"
+                    }
+                },
+                "botDefense": {
+                    "localPublisher": "enabled",
+                    "remotePublisher": {
+                        "use": "logDest_publisher"
+                    },
+                    "logAlarm": true,
+                    "logBlock": true,
+                    "logBotSignatureMatchedRequests": true,
+                    "logIllegalRequests": true,
+                    "logMaliciousBot": true,
+                    "logRateLimit": true,
+                    "logSuspiciousBrowser": true,
+                    "logTcpReset": true,
+                    "logUntrustedBot": true                   
+                }
+            }
+        }
+    },
+    "WebTop": {
+        "class": "Tenant",
+        "Webtop": {
+            "class": "Application",
+            "template": "https",
+            "serviceMain": {
+                "class": "Service_HTTPS",
+                "redirect80": true,
+                "virtualAddresses": [
+                    { "use": "/Common/Shared/wildcardAddress" }
+                ],
+                "virtualPort": 443,
+                "snat": "none",
+                "profileTCP": {
+                    "bigip": "/Common/f5-tcp-progressive"
+                },
+                "profileHTTP": {
+                    "use": "webtop_http"
+                },
+                "clientTLS": {
+                    "bigip": "/Common/serverssl-insecure-compatible"
+                },
+                "serverTLS": "webtop_clientssl",
+                "policyWAF": {
+                    "use": "webtop_waf_pol"
+                },
+                "profileTrafficLog": {
+                    "use": "/Common/Shared/telemetry_traffic_log_profile"
+                },
+                "securityLogProfiles": [
+                    {
+                      "bigip": "/Common/Log all requests"
+                    },
+                    {
+                      "use": "/Common/Shared/telemetry_security_log_profile"
+                    }
+                ],
+                "allowVlans": [
+                    { "bigip": "/Common/external" }
+                ]
+            },
+            "webtop_http": {
+                "class": "HTTP_Profile",
+                "hstsInsert": true,
+                "hstsPreload": true
+            },
+            "webtop_waf_pol": {
+                "class": "WAF_Policy",
+                "url": "https://raw.githubusercontent.com/f5devcentral/overwatch/refs/heads/main/f5BigIp/asm/ingress-web.xml",
+                "ignoreChanges": true
+            },
+            "webtop_clientssl": {
+                "certificates": [
+                    {
+                        "certificate": "Wildcard_certificate"
+                    }
+                ],
+                "ciphers": "DEFAULT",
+                "requireSNI": false,
+                "class": "TLS_Server"
+            },
+            "Wildcard_certificate": {
+                "class": "Certificate",
+                "remark": "in practice we recommend using a passphrase",
+                "certificate": "-----BEGIN CERTIFICATE-----\nMIIDtTCCAp2gAwIBAgIBAzANBgkqhkiG9w0BAQsFADBGMQswCQYDVQQGEwJVUzET\nMBEGA1UECAwKQ2FsaWZvcm5pYTESMBAGA1UECgwJTXlDb21wYW55MQ4wDAYDVQQD\nDAVsYWJDQTAeFw0xOTA0MjUyMzM3NDVaFw0yOTA0MjIyMzM3NDVaMF8xCzAJBgNV\nBAYTAkNBMRAwDgYDVQQIEwdPbnRhcmlvMRQwEgYDVQQKEwtGNSBOZXR3b3JrczEO\nMAwGA1UECxMFU2FsZXMxGDAWBgNVBAMTD3dlYnRvcC5mNXNlLmNvbTCCASIwDQYJ\nKoZIhvcNAQEBBQADggEPADCCAQoCggEBAO6mWzsOY0UuRzSiVU65gmlSit4d7tW4\nE/kWYY3LT/dxG2V/kzHhO70amNCTDVv5oAKkToLYCdJNWWxEI+EgUigDtg/v4E1R\nH0KEQdGC6RHnYK8kOmWWm9Pminh1P1o03QiJ41zj5KcyFYJq4pFRctN5iPs0+F/Y\n5JBDbPcnuk3OuRLxI67tPwqAQQurXcvGzCYF1y1zxlHxxWyUbuTdCo3GeO2Vo3bN\nMSTSj9hmxc8QEXif1qA/KDnLtY+IemptJT5aC0WZRwp2lncKOpSLcMcdQAprxHYA\n6LLkztNqVwCXQFjA7zfVRXV63JGhjV+oR4O8yemLffUVydihXzcsruMCAwEAAaOB\nlDCBkTAJBgNVHRMEAjAAMB0GA1UdDgQWBBRjzhMuUopHVdDvj9xvCskIPacvQzAf\nBgNVHSMEGDAWgBQMgRSSF2oS8RCZJADBj3YSv90EsTAOBgNVHQ8BAf8EBAMCBeAw\nNAYDVR0lAQH/BCowKAYIKwYBBQUHAwIGCCsGAQUFBwMBBggrBgEFBQcDAwYIKwYB\nBQUHAwQwDQYJKoZIhvcNAQELBQADggEBAKxtUE9tImn6MF0E2RNYeaTkIyCozjPw\nARofuW4eE5VKoZyq8JCbzUG44yT8gCSAj24LYuM7mk9CceHpu4pSyLHuptP1W8ZT\nzpy4BPHaeFoJZCgBW8KkOdlW/4WRTmbfG3YaxPClOj7f5P4Tkw2XaftPJqQWZnCx\npEBU8e5AVOSmV1/vkhEi5FjV1aCXEm2DH9TJQtxABKGCaNtwnS701mmJH0HWlDSm\nMyBI/jTOO2XMoWGEzL9pIMiPPGZZbGWUIfvfhsgBFnJoSUa9ijteR5CLhX7DIfAl\njuMTHgWmsN80SOIEUaLYNfeFQxkgL0uVc8nzc3JGN+78h+Ktg4piRCM=\n-----END CERTIFICATE-----",
+                "privateKey": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDupls7DmNFLkc0\nolVOuYJpUoreHe7VuBP5FmGNy0/3cRtlf5Mx4Tu9GpjQkw1b+aACpE6C2AnSTVls\nRCPhIFIoA7YP7+BNUR9ChEHRgukR52CvJDpllpvT5op4dT9aNN0IieNc4+SnMhWC\nauKRUXLTeYj7NPhf2OSQQ2z3J7pNzrkS8SOu7T8KgEELq13LxswmBdctc8ZR8cVs\nlG7k3QqNxnjtlaN2zTEk0o/YZsXPEBF4n9agPyg5y7WPiHpqbSU+WgtFmUcKdpZ3\nCjqUi3DHHUAKa8R2AOiy5M7TalcAl0BYwO831UV1etyRoY1fqEeDvMnpi331FcnY\noV83LK7jAgMBAAECggEAE06WFuMFGPWzgQiZCjNr34V0AqA9UEECLKao4cXPBF+8\nLavyhpiIMrZSIp2i+Qvq7AvK5j8AHGlxkJa6qF3rB521PvjTFq43bzQv9vk2TeKA\nKesuZkWW+b+u+CvUIkIgl65AHKW7O+OLZe+rwMHsHju430nbxjVP2HP7/srSAbVN\nt3yyXPmI4VSB2P8NzkYCzr/B46LcS/2OBno9iwjQwDspQNJhpUmxPsFfG0OS0WWh\nqLgpUvG8GEPkCv8fRjjrqh9iJ3kZOpmv5nQ1OE0ypwYoPhJDiJAAZiXRtPImoM06\n2M6CbvtdunRuVvVNBYgu75jRgunZycQJP48tWWcWsQKBgQD7/X1WKBIqJRZcDYTf\n8pHFDzZxhDOpYX31vddk7A3xv9XvqQVCu6hkbFvMu5b80AOeYlo2SCvaA97sS7Bp\nbafoT6ZCwBztEBjk9v+X0LOSg847c/ik3+M9Nsnpv9N0qdjGtPgm8Kb15PaiHYAH\nT6kLkvYCFS5G17B2sVoOoWg7fQKBgQDycoX2+FPMPFqUesZ3BlAcZM8sVFTg1VL6\nRGesJLrT/3ueOUiCWjjcJlPodBNg2Y8N3hQV0CdwGxR14nKoVw0vpv+r/iJp1F7s\nsGqjtMIw6fHdqPdX2GIvraIxU+j8p94R1ACii3aztqcluJ1S8CsNmUxgUoMJKtO/\ntvNB4Pjh3wKBgELz/kpXCUSDaCZ7PRPXup12RkvxCVz212Xk1AcvpSDXjLtJ2Gj7\nvWk5VUbXjO2NQ3jgvwFvOZ+Kqb90+OF6TkOubgmMS+M9BLBJZG3s+Nl0BebMEIOW\nLSWFmi5uVnvH6R4a1VhbVrE87b7zQaIvq0W0/YJeKFaQVoWi57+9aRltAoGBANV/\n5FjH9YM04s8+Dudht8pJO+ddnCEhuiCJfIIrFhr6MHH1H9UqfkffuKRLE4WGEGO1\n3RoYY6JlNm9ZKn7zqbj85ske0k8/pRfpgv8Gfrt0SHlaAfZppo016k5mBhX3/abV\nenmpNq6reiXNnT0cIc2n4YoxHxNDk5SQF0c8Re8hAoGATtdkvUp4f6A4v9ppdJZs\npz7M6/NbKGJH9F3GZseSKTBKgtndiBugrfePOrcdC+4O0i33lvWDOs70kREC4wCG\nXMt36aS9Z384Pl7Z7FhiVQrTF2ZuRP/6v1r3iJDHixmJYQzjBO2Zh1D7Sf39BxOv\n2h0dFcPMKaZcLsXTFH1qS0I=\n-----END PRIVATE KEY-----"
+            }
+        },
+        "WebSSHProxy": {
+            "class": "Application",
+            "template": "http",
+            "serviceMain": {
+                "class": "Service_HTTP",
+                "virtualPort": 10022,
+                "snat": "none",
+                "profileTCP": {
+                    "bigip": "/Common/f5-tcp-progressive"
+                },
+                "virtualAddresses": [
+                    { "use": "/Common/Shared/wildcardAddress" }
+                ],
+                "allowVlans": [
+                    { "bigip": "/Common/external" }
+                ]
+            }
+        }
+    }
+}
