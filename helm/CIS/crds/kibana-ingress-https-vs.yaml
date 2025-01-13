@@ -31,7 +31,7 @@ spec:
        send: "HEAD / HTTP/1.0\r\n\r\n"
        timeout: 15
        type: https
-  tlsProfileName: reencrypt-tls13
+  tlsProfileName: kibana-reencrypt-tls13
 ---
 apiVersion: cis.f5.com/v1
 kind: TLSProfile

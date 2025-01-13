@@ -4,6 +4,18 @@
 helm repo add elastic https://helm.elastic.co
 helm repo update
 
+# install Elastic CRDs and Operator
+#helm upgrade --install elastic-operator-crds elastic/eck-operator-crds
+helm upgrade --install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
+
+
+# install elasticsearch init container DaemonSet
+#kubectl apply -n elastic-system -f max-map-counter-setter.yaml
+### replaced with init-container definiton in podSpec
+
+# install ECK stack: elasticsearch-kibana-logstash-beats
+helm upgrade --install elk-stack elastic/eck-stack -n elastic-system --create-namespace --values ./values.yaml
+
 #ES Scheduler Priority settings
 cluUrl="_cluster/settings"
 cat <<-EOF >> es-priority-classes.yaml
@@ -23,17 +35,6 @@ value: 2000000
 globalDefault: false
 description: "This priority class should be used for filebeat pods only."
 EOF
-
-# install Elastic CRDs and Operator
-#helm upgrade --install elastic-operator-crds elastic/eck-operator-crds
-helm upgrade --install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
-
-
-# install elasticsearch init container DaemonSet
-kubectl apply -n elastic-system -f max-map-counter-setter.yaml
-
-# install ECK stack: elasticsearch-kibana-logstash-beats
-helm upgrade --install elk-stack elastic/eck-stack -n elastic-system --create-namespace --values ./values.yaml
 
 #ES index component_template
 componentUrl="_component_template/component_template_default"
@@ -134,16 +135,6 @@ for pod in `k describe endpoints elasticsearch-es-http -n elastic-system |grep '
     curl -u elastic:${esPass} \
     -k -X PUT -H "Content-type: application/json" https://${pod}:9200/${cluUrl} --data @./cluster.json | jq;
 ); done;
-
-# old index settings code
-#cat <<-EOF >> index.json
-#{
-#    "settings": {
-#        "index.mapping.total_fields.limit": 10000
-#    }
-#}
-#EOF
-#curl -u elastic:${esPass} -k -X PUT -H "Content-type: application/json" https://10.120.0.69:9200/logstash-hec-2024.12.04/_settings --data @./index.json
 
 # show elastic-operator logs
 echo "Username: elastic"

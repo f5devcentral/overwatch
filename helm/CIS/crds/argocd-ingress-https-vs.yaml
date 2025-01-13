@@ -22,7 +22,7 @@ spec:
   pools:
   - path: /
     service: argocd-stack-server
-    servicePort: 80
+    servicePort: 443
     reselectTries: 3
     serviceDownAction: reselect
     monitors:
@@ -31,12 +31,12 @@ spec:
        send: "HEAD / HTTP/1.0\r\n\r\n"
        timeout: 15
        type: http
-  tlsProfileName: argo-terminate-tls13
+  tlsProfileName: argo-reencrypt-tls13
 ---
 apiVersion: cis.f5.com/v1
 kind: TLSProfile
 metadata:
-  name: argo-terminate-tls13
+  name: argo-reencrypt-tls13
   namespace: argocd
   labels:
     f5cr: "true"
@@ -45,8 +45,9 @@ spec:
     tlsVersion: "1.3"
     cipherGroup: /Common/f5-default
   tls:
-    termination: edge
+    termination: reencrypt
     clientSSL: /Common/clientssl
+    serverSSL: /Common/serverssl
     reference: bigip
   hosts:
   - argocd.f5demo.com
