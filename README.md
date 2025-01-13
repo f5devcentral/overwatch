@@ -20,7 +20,7 @@ NB: Autoscaling is not enabled by default. Manual scaling of both the F5 BIG-IP 
 
 This solution was designed an implemented Government of Canada federal clients in mind and all the constraints and regulatory compliance that comes with that type of deployment pattern. These constraints force certain design choices that might otherwise not be optimal. 
 
-For extended details on the solution design please refer to the [DESIGN.md](https://github.com/f5devcentral/overwatch/blob/main/DESIGN.md) page.
+For extended details on the solution design please refer to the [DESIGN.md](https://github.com/f5devcentral/overwatch/blob/main/docs/DESIGN.md) page.
 
 ## Getting Started
 
