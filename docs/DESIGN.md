@@ -6,7 +6,7 @@
 
 ## Service Design
 
-![alt text](image.png)
+![alt text](images/image-1.png)
 
 ## Logical Flow: Metrics
 
