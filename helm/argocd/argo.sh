@@ -9,6 +9,6 @@ helm install --upgrade argocd-stack argo/argo-cd -n argocd --create-namespace --
 
 # show elastic-operator logs
 argoPass=`kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`
-echo "Username: elastic"
+echo "Username: admin"
 echo "Password: ${argoPass}"
 echo ""

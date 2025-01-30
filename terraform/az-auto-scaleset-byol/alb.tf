@@ -7,7 +7,7 @@ resource "azurerm_public_ip" "lbpip" {
   sku                 = "Standard"
   resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
-  domain_name_label   = "overwatch-lbpip"
+  domain_name_label   = "ingress-lbpip"
   tags = {
     owner = var.resourceOwner
   }
@@ -66,6 +66,20 @@ resource "azurerm_lb_rule" "lb_rule-https" {
   protocol                       = "Tcp"
   frontend_port                  = 443
   backend_port                   = 443
+  frontend_ip_configuration_name = "LoadBalancerFrontEnd"
+  enable_floating_ip             = false
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  idle_timeout_in_minutes        = 5
+  probe_id                       = azurerm_lb_probe.lb_probe.id
+}
+
+# Create frontend LB rule
+resource "azurerm_lb_rule" "lb_rule-f5SyslogTcp" {
+  name                           = "LBRule-Syslog-TCP"
+  loadbalancer_id                = azurerm_lb.lb.id
+  protocol                       = "Tcp"
+  frontend_port                  = 8514
+  backend_port                   = 8514
   frontend_ip_configuration_name = "LoadBalancerFrontEnd"
   enable_floating_ip             = false
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]

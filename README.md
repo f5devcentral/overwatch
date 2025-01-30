@@ -29,7 +29,7 @@ This implementation is designed to deploy into an existing Azure resource-group 
 ### Part I: Regions, Resource Groups, VNets, Subnets, NatGW, NSGs
   1. Clone the repo to your local environment.
   2. Create a Resource Group in the Azure region of your choice.
-  3. Create 3 Network Security Groups:
+  3. Create three Network Security Groups:
       - mgmtNsg (default ruleset)
       - extNsg (default ruleset)
       - intNsg (default ruleset)
@@ -191,6 +191,7 @@ Part V: Deploy the modern observability software stack
   for i in `ls -1 *.yml`; do (kubectl apply -n grafana-system -f $i)
 ```
 ### Part VI: Initial Setup
+
   23. Extract the ElasticSearch admin password using the following command:
 ```bash
   #Fetch ES Creds
@@ -210,13 +211,13 @@ Part V: Deploy the modern observability software stack
   echo ""
 ```
   25. Import the Kibana Dashboards
-    - Login to ElasticSearch with credentials retrieved in Step 23.
-    - In the Main Menu, select Stack Management
-    - In the new menu, under Kibana, select Data Management
-    - Select Dashboards
-    - Select Import
-    - Browse to the local copy of the kibana dashboards and select the first bundle (.ndjson)
-    - Repeat for the second and third bundle
+      - Login to ElasticSearch with credentials retrieved in Step 23.
+      - In the Main Menu, select Stack Management
+      - In the new menu, under Kibana, select Data Management
+      - Select Dashboards
+      - Select Import
+      - Browse to the local copy of the kibana dashboards and select the first bundle (.ndjson)
+      - Repeat for the second and third bundle
 
 ### Part V: Out of the box functionality
 
